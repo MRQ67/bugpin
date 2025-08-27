@@ -1,0 +1,42 @@
+import { Badge } from '@/components/ui/badge'
+import { type ErrorPost } from '@/lib/types'
+import LikeButton from '@/components/posts/like-button'
+import CommentForm from '@/components/comments/comment-form'
+import CommentList from '@/components/comments/comment-list'
+
+export default function PostDetail({ post }: { post: ErrorPost }) {
+  return (
+    <article className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+      <div className="w-full overflow-hidden rounded-lg border bg-muted">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={post.image_url} alt={post.title} className="w-full h-auto object-contain" />
+      </div>
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold">{post.title}</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          {post.language && <Badge variant="secondary">{post.language}</Badge>}
+          {post.error_type && <Badge variant="outline">{post.error_type}</Badge>}
+          {Array.isArray(post.tags) &&
+            post.tags.slice(0, 5).map((t) => (
+              <Badge key={t} variant="default">#{t}</Badge>
+            ))}
+        </div>
+        <div className="pt-1">
+          <LikeButton postId={post.id} initialCount={post.likes_count ?? 0} />
+        </div>
+        {post.extracted_text ? (
+          <pre className="whitespace-pre-wrap text-sm p-3 rounded border bg-card overflow-auto">
+            {post.extracted_text}
+          </pre>
+        ) : (
+          <p className="text-sm text-muted-foreground">No OCR text extracted.</p>
+        )}
+        <section className="space-y-3">
+          <h2 className="text-lg font-medium">Comments</h2>
+          <CommentForm postId={post.id} />
+          <CommentList postId={post.id} />
+        </section>
+      </div>
+    </article>
+  )
+}
