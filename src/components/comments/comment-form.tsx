@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
 export default function CommentForm({ postId }: { postId: string }) {
   const supabase = createClient()
+  const router = useRouter()
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -27,6 +29,8 @@ export default function CommentForm({ postId }: { postId: string }) {
       })
       if (error) throw error
       setContent('')
+      // Revalidate server components and show the new comment
+      router.refresh()
     } catch (e) {
       console.error('Add comment error', e)
       alert('Failed to add comment')

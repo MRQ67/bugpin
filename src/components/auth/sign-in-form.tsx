@@ -12,10 +12,14 @@ export default function SignInForm() {
   const signIn = async (provider: 'github' | 'google') => {
     try {
       setLoading(provider)
+      const params = new URLSearchParams(window.location.search)
+      const redirectedFrom = params.get('redirectedFrom') || '/'
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${location.origin}/auth/callback`,
+          redirectTo: `${location.origin}/auth/callback?redirectedFrom=${encodeURIComponent(
+            redirectedFrom
+          )}`,
         },
       })
       if (error) throw error

@@ -3,7 +3,7 @@
 
 'use client'
 
-import Tesseract, { type WorkerOptions } from 'tesseract.js'
+import type { WorkerOptions } from 'tesseract.js'
 
 export type OCRResult = {
   text: string
@@ -23,6 +23,7 @@ export async function runOCR(
   const image = typeof source === 'string' ? source : URL.createObjectURL(source)
 
   try {
+    const { default: Tesseract } = await import('tesseract.js')
     const { data } = await Tesseract.recognize(image, lang, {
       logger: (m: any) => {
         if (m.status === 'recognizing text' && typeof m.progress === 'number') {
