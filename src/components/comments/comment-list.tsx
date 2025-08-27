@@ -7,13 +7,15 @@ type Item = {
   id: string
   content: string
   created_at: string
-  user?: { name?: string | null; username?: string | null }
+  user_id: string
+  user?: { name?: string | null; username?: string | null; avatar_url?: string | null }
 }
 
 export default function CommentList({ postId }: { postId: string }) {
   const supabase = createClient()
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
+  const [profiles, setProfiles] = useState<Record<string, { name?: string | null; username?: string | null; avatar_url?: string | null }>>({})
 
   useEffect(() => {
     let mounted = true
@@ -22,14 +24,35 @@ export default function CommentList({ postId }: { postId: string }) {
       setLoading(true)
       const { data, error } = await supabase
         .from('comments')
-        .select('id, content, created_at')
+        .select('id, content, created_at, user_id')
         .eq('error_post_id', postId)
         .order('created_at', { ascending: true })
       if (!mounted) return
       if (error) {
         console.error('Load comments error', error)
       }
-      setItems((data ?? []) as Item[])
+      const list = (data ?? []) as Item[]
+      setItems(list)
+      // Batch load profiles for unique user_ids
+      const ids = Array.from(new Set(list.map((c) => c.user_id))).filter(Boolean)
+      if (ids.length) {
+        const { data: profs, error: pErr } = await supabase
+          .from('profiles')
+          .select('id, name, username, avatar_url')
+          .in('id', ids)
+        if (!mounted) return
+        if (pErr) {
+          console.error('Load profiles error', pErr)
+        } else {
+          const map: Record<string, { name?: string | null; username?: string | null; avatar_url?: string | null }> = {}
+          for (const p of profs ?? []) map[(p as any).id] = {
+            name: (p as any).name,
+            username: (p as any).username,
+            avatar_url: (p as any).avatar_url,
+          }
+          setProfiles(map)
+        }
+      }
       setLoading(false)
     }
 
@@ -42,7 +65,28 @@ export default function CommentList({ postId }: { postId: string }) {
         { event: '*', schema: 'public', table: 'comments', filter: `error_post_id=eq.${postId}` },
         (payload: any) => {
           if (payload.eventType === 'INSERT') {
-            setItems((prev) => [...prev, payload.new as Item])
+            const inserted = payload.new as Item
+            setItems((prev) => [...prev, inserted])
+            const uid = (inserted as any).user_id
+            if (uid && !profiles[uid]) {
+              // lazy-load missing profile
+              supabase
+                .from('profiles')
+                .select('id, name, username, avatar_url')
+                .eq('id', uid)
+                .single()
+                .then(({ data: p }) => {
+                  if (!p) return
+                  setProfiles((prev) => ({
+                    ...prev,
+                    [(p as any).id]: {
+                      name: (p as any).name,
+                      username: (p as any).username,
+                      avatar_url: (p as any).avatar_url,
+                    },
+                  }))
+                })
+            }
           } else if (payload.eventType === 'DELETE') {
             setItems((prev) => prev.filter((c) => c.id !== (payload.old as any).id))
           } else if (payload.eventType === 'UPDATE') {
@@ -64,14 +108,36 @@ export default function CommentList({ postId }: { postId: string }) {
 
   return (
     <ul className="space-y-3">
-      {items.map((c) => (
-        <li key={c.id} className="rounded border p-3 text-sm">
-          <div className="text-foreground whitespace-pre-wrap">{c.content}</div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            {new Date(c.created_at).toLocaleString()}
-          </div>
-        </li>
-      ))}
+      {items.map((c) => {
+        // Use user data from comment if available, otherwise fall back to profiles cache
+        const userData = c.user || profiles[c.user_id]
+        const displayName = userData?.name || userData?.username || 'Unknown user'
+        
+        return (
+          <li key={c.id} className="rounded border p-3 text-sm">
+            <div className="flex items-start gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={userData?.avatar_url || '/next.svg'}
+                alt={displayName}
+                className="h-7 w-7 rounded-full border object-cover bg-card mt-0.5"
+              />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{displayName}</span>
+                  {userData?.username && (
+                    <span className="text-xs text-muted-foreground">@{userData.username}</span>
+                  )}
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {new Date(c.created_at).toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-foreground whitespace-pre-wrap">{c.content}</div>
+              </div>
+            </div>
+          </li>
+        )
+      })}
     </ul>
   )
 }

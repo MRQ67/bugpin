@@ -4,12 +4,33 @@ import LikeButton from '@/components/posts/like-button'
 import CommentForm from '@/components/comments/comment-form'
 import CommentList from '@/components/comments/comment-list'
 
-export default function PostDetail({ post }: { post: ErrorPost }) {
+type Author = { id: string; name: string | null; username: string | null; avatar_url: string | null } | null
+
+export default function PostDetail({ post }: { post: ErrorPost & { author?: Author } }) {
   return (
     <article className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-      <div className="w-full overflow-hidden rounded-lg border bg-muted">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={post.image_url} alt={post.title} className="w-full h-auto object-contain" />
+      <div className="space-y-4">
+        <div className="w-full overflow-hidden rounded-lg border bg-muted">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={post.image_url} alt={post.title} className="w-full h-auto object-contain" />
+        </div>
+        {/* Author info under the image */}
+        <div className="flex items-center gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.author?.avatar_url || '/next.svg'}
+            alt={(post.author?.name || post.author?.username || 'Author') as string}
+            className="h-8 w-8 rounded-full border object-cover bg-card"
+          />
+          <div className="text-sm">
+            <div className="font-medium leading-tight">
+              {post.author?.name || post.author?.username || 'Unknown user'}
+            </div>
+            {post.author?.username && (
+              <div className="text-xs text-muted-foreground">@{post.author.username}</div>
+            )}
+          </div>
+        </div>
       </div>
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold">{post.title}</h1>

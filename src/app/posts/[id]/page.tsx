@@ -27,9 +27,16 @@ export default async function PostPage({
 
   if (error || !post) return notFound()
 
+  // Fetch author profile
+  const { data: author } = await supabase
+    .from('profiles')
+    .select('id, name, username, avatar_url')
+    .eq('id', (post as any).user_id)
+    .single()
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <PostDetail post={post as any} />
+      <PostDetail post={{ ...(post as any), author }} />
     </div>
   )
 }
