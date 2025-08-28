@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-export function AuthButton() {
+export function AuthButton({ variant = 'default' }: { variant?: 'default' | 'avatar' }) {
   const supabase = createClient()
   const [loading, setLoading] = useState(false)
   const [user, setUser] = useState<null | { email?: string | null; user_metadata?: { avatar_url?: string; name?: string } }>(null)
@@ -26,6 +26,16 @@ export function AuthButton() {
   }, [supabase])
 
   if (!user) {
+    if (variant === 'avatar') {
+      // Show placeholder avatar linking to sign-in
+      return (
+        <Link href="/sign-in" className="inline-flex">
+          <Avatar className="h-7 w-7">
+            <AvatarFallback>IN</AvatarFallback>
+          </Avatar>
+        </Link>
+      )
+    }
     return (
       <Button asChild size="sm" variant="outline">
         <Link href="/sign-in">Sign in</Link>
@@ -35,6 +45,17 @@ export function AuthButton() {
 
   const avatarUrl = (user.user_metadata?.avatar_url as string) || ''
   const display = (user.user_metadata?.name as string) || user.email || 'User'
+
+  if (variant === 'avatar') {
+    return (
+      <Link href="/profile/me" className="inline-flex">
+        <Avatar className="h-7 w-7">
+          <AvatarImage src={avatarUrl} alt={display} />
+          <AvatarFallback>{display.slice(0, 2).toUpperCase()}</AvatarFallback>
+        </Avatar>
+      </Link>
+    )
+  }
 
   return (
     <div className="flex items-center gap-2">

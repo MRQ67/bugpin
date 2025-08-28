@@ -29,12 +29,6 @@ export default async function Home({
 
   return (
     <div className="container mx-auto px-4 py-4">
-      <div className="mb-2">
-        <h1 className="text-xl font-semibold">Latest errors</h1>
-      </div>
-      <div className="mb-4">
-        <SearchBar />
-      </div>
       <PostGrid posts={(posts ?? []) as any} />
     </div>
   )
