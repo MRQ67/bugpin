@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Zain } from "@next/font/google";
+import { Zain } from "next/font/google";
 import { Home, Plus, User } from 'lucide-react';
 import Navbar from "@/components/common/navbar";
 import { FloatingDock } from "@/components/ui/floating-dock";

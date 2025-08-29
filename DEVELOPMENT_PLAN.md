@@ -95,8 +95,8 @@ Here are the next tasks to improve the project's robustness, performance, and us
 #### G. Migrate from `@next/font` to `next/font`
 **Goal:** Update the project to use the built-in `next/font` and remove the deprecated `@next/font` package to align with Next.js 14 standards.
 
-- [ ] **To-Do:**
-    - [ ] Run the `built-in-next-font` codemod to automatically update import paths.
-    - [ ] Verify the changes made by the codemod in the codebase.
-    - [ ] Uninstall the `@next/font` package.
-    - [ ] Run `npm install` to update the lockfile.
+- [x] **Done:**
+    - [x] Run the `built-in-next-font` codemod to automatically update import paths.
+    - [x] Verify the changes made by the codemod in the codebase.
+    - [x] Uninstall the `@next/font` package.
+    - [x] Run `npm install` to update the lockfile.
