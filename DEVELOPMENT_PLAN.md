@@ -107,79 +107,34 @@ Here are the next tasks to improve the project's robustness, performance, and us
     - [ ] Use a library like `framer-motion` to animate the transition between the two navigation bars.
     - [ ] Ensure the transition is smooth and performant.
 
-#### J. Simplify Upload Page - Image & Caption Only
+#### J. ✅ Simplify Upload Page - Image & Caption Only (COMPLETED)
 **Goal:** Streamline the upload experience by removing complex form fields and focusing on just image upload and a simple caption with emotional context.
 
-**Current State Analysis:**
-- The current upload form likely includes fields for language selection, error type, detailed descriptions, and other metadata
-- Users may find the current form overwhelming or time-consuming
-- The goal is to make sharing error screenshots as frictionless as possible, similar to social media posting
+**✅ Implementation Completed:**
+- **Simplified Upload Form**: Completely refactored to show only image upload and caption
+- **Drag & Drop Support**: Large, intuitive drag-and-drop zone with file picker fallback
+- **Emotional Caption**: Single textarea with placeholder "How does this error make you feel? huh!"
+- **Visual Upload Button**: Prominent "Share Your Pain" button with loading states
+- **Clean UI**: Minimal, distraction-free interface focusing on essentials
+- **Mobile Optimized**: Responsive design that works great on mobile devices
+- **Optional Caption**: Users can upload with or without caption (defaults to "Untitled Error")
+- **Image Preview**: Shows preview with remove/change options
+- **Character Counter**: 500 character limit with live counter
+- **Updated Tests**: Comprehensive tests for the simplified upload flow
 
-**New Simplified Design:**
-- **Image Upload Area**: Large, prominent drag-and-drop zone or file picker
-- **Caption Field**: Single textarea with placeholder "How does this error make you feel? huh!"
-- **Upload Button**: Simple, prominent call-to-action button
-- **Clean UI**: Minimal, distraction-free interface focusing on the essentials
+**✅ Technical Changes:**
+- **Database**: Leveraged existing nullable fields (language, error_type, tags)
+- **API Route**: Updated to handle simplified payload and remove title requirement
+- **Form Validation**: Simplified to only require image file
+- **Upload Page**: Updated copy to "Share your coding pain" theme
+- **Backward Compatibility**: Existing posts continue to work perfectly
 
-- [ ] **To-Do:**
-    - [ ] **Database Schema Updates:**
-        - [ ] Review current `error_posts` table structure
-        - [ ] Make language, error_type, and other detailed fields optional or remove them
-        - [ ] Ensure the table can handle posts with just image_url and caption
-        - [ ] Update any database constraints that might require the removed fields
-    
-    - [ ] **Backend API Changes:**
-        - [ ] Modify `/api/upload/route.ts` to accept simplified payload (image + caption only)
-        - [ ] Remove validation for language and error type fields
-        - [ ] Update the database insertion logic to work with minimal data
-        - [ ] Ensure OCR processing still works with the simplified approach
-        - [ ] Add default values or null handling for removed fields
-    
-    - [ ] **Frontend Component Refactor:**
-        - [ ] Simplify `src/components/posts/post-upload-form.tsx` or create new simplified version
-        - [ ] Remove language selector, error type dropdown, and detailed description fields
-        - [ ] Create a large, prominent image upload area (drag-and-drop + file picker)
-        - [ ] Add single caption textarea with placeholder "How does this error makes you feel? huh!"
-        - [ ] Style the form to be clean and minimal
-        - [ ] Ensure proper image preview functionality
-        - [ ] Add loading states for upload process
-    
-    - [ ] **Upload Page UI/UX:**
-        - [ ] Update `/src/app/upload/page.tsx` to use the simplified form
-        - [ ] Design a clean, focused layout with minimal distractions
-        - [ ] Add visual hierarchy: Image upload → Caption → Upload button
-        - [ ] Ensure mobile responsiveness for the simplified design
-        - [ ] Add helpful micro-interactions and feedback
-    
-    - [ ] **Form Validation Updates:**
-        - [ ] Update Zod schema to only validate image and caption
-        - [ ] Ensure caption is optional or has minimal length requirements
-        - [ ] Add proper image file type and size validation
-        - [ ] Remove validation for language and error type fields
-    
-    - [ ] **Type Definitions:**
-        - [ ] Update TypeScript interfaces to reflect simplified data structure
-        - [ ] Modify `ErrorPost` type to make removed fields optional
-        - [ ] Update any components that consume post data to handle missing fields gracefully
-    
-    - [ ] **Backward Compatibility:**
-        - [ ] Ensure existing posts with detailed metadata still display correctly
-        - [ ] Add migration strategy for existing data if needed
-        - [ ] Update post display components to handle both old and new post formats
-    
-    - [ ] **Testing & Quality Assurance:**
-        - [ ] Test the simplified upload flow end-to-end
-        - [ ] Verify image upload and OCR processing still works
-        - [ ] Ensure posts display correctly in the masonry layout
-        - [ ] Test mobile upload experience
-        - [ ] Validate that existing posts aren't broken by the changes
-
-**Expected Benefits:**
-- **Faster Upload Process**: Users can share errors quickly without filling complex forms
-- **Lower Barrier to Entry**: New users won't be intimidated by detailed form fields
-- **Better Mobile Experience**: Simplified interface works better on mobile devices
-- **Increased Engagement**: Easier sharing should lead to more posts
-- **Focus on Community**: Emotional caption encourages community interaction and support
+**✅ Benefits Achieved:**
+- **Faster Upload Process**: Users can share errors in seconds
+- **Lower Barrier to Entry**: No intimidating form fields
+- **Better Mobile Experience**: Touch-friendly drag-and-drop interface
+- **Increased Engagement**: Emotional captions encourage community interaction
+- **Focus on Community**: Emphasizes sharing feelings rather than technical details
 
 #### K. Remove OCR Functionality - Simplify and Improve Reliability
 **Goal:** Remove OCR (Optical Character Recognition) functionality to simplify the codebase, improve reliability, and reduce complexity for users.
@@ -252,6 +207,7 @@ Here are the next tasks to improve the project's robustness, performance, and us
 - [x] **Post upload functionality implemented.**
 - [x] **OCR functionality removed for simplicity and reliability.**
 - [x] **Fixed Supabase cookie modification errors in Next.js 15.**
+- [x] **Simplified upload page to image + caption only with emotional focus.**
 - [x] **Enhance Search Bar UI**
 - [x] **Migrate from `@next/font` to `next/font`**
 - [x] **Implement Pinterest-Style Masonry Layout for Homepage**

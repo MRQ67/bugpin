@@ -14,13 +14,13 @@ export async function POST(req: Request) {
 
     const form = await req.formData()
     const file = form.get('file') as File | null
-    const title = String(form.get('title') || '')
-    const language = (form.get('language') as string) || null
-    const error_type = (form.get('error_type') as string) || null
-    const tagsRaw = (form.get('tags') as string) || ''
+    const title = String(form.get('title') || 'Untitled Error')
+    const language = null // Simplified: no language selection
+    const error_type = null // Simplified: no error type selection
+    const tagsRaw = '' // Simplified: no tags
 
     if (!file) return NextResponse.json({ error: 'Missing file' }, { status: 400 })
-    if (!title.trim()) return NextResponse.json({ error: 'Missing title' }, { status: 400 })
+    // Title is optional - will use default if empty
 
     const ext = file.name.split('.').pop() || 'png'
     const fileName = `${Math.random().toString(36).slice(2)}.${ext}`

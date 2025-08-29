@@ -44,13 +44,22 @@ describe('PostUploadForm', () => {
     vi.clearAllMocks()
   })
 
-  it('renders upload form without OCR elements', () => {
+  it('renders simplified upload form with only image and caption', () => {
     render(<PostUploadForm />)
     
-    // Should have basic form elements
+    // Should have simplified form elements
     expect(screen.getByLabelText(/error screenshot/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/title/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /upload/i })).toBeInTheDocument()
+    expect(screen.getByLabelText(/caption/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /share your pain/i })).toBeInTheDocument()
+    
+    // Should have the emotional placeholder text
+    expect(screen.getByPlaceholderText(/how does this error make you feel/i)).toBeInTheDocument()
+    
+    // Should NOT have complex form fields
+    expect(screen.queryByLabelText(/title/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/language/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/error type/i)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/tags/i)).not.toBeInTheDocument()
     
     // Should NOT have OCR-related elements
     expect(screen.queryByText(/ocr progress/i)).not.toBeInTheDocument()
@@ -58,7 +67,7 @@ describe('PostUploadForm', () => {
     expect(screen.queryByText(/ocr complete/i)).not.toBeInTheDocument()
   })
 
-  it('handles file selection without OCR processing', async () => {
+  it('handles file selection with drag and drop support', async () => {
     render(<PostUploadForm />)
     
     const fileInput = screen.getByLabelText(/error screenshot/i)
@@ -66,25 +75,36 @@ describe('PostUploadForm', () => {
     
     fireEvent.change(fileInput, { target: { files: [file] } })
     
-    // Should show preview without OCR status
+    // Should show preview
     await waitFor(() => {
-      const preview = screen.getByAltText('preview')
+      const preview = screen.getByAltText('Preview')
       expect(preview).toBeInTheDocument()
     })
+    
+    // Should show remove and change buttons
+    expect(screen.getByText('Remove')).toBeInTheDocument()
+    expect(screen.getByText('Change Image')).toBeInTheDocument()
     
     // Should not show any OCR-related status
     expect(screen.queryByText(/ocr/i)).not.toBeInTheDocument()
   })
 
-  it('validates required fields', async () => {
+  it('validates that image is required', async () => {
     render(<PostUploadForm />)
     
-    const uploadButton = screen.getByRole('button', { name: /upload/i })
+    const uploadButton = screen.getByRole('button', { name: /share your pain/i })
     
-    // Try to submit without file
-    fireEvent.click(uploadButton)
+    // Button should be disabled without file
+    expect(uploadButton).toBeDisabled()
     
-    // Should not proceed (form validation should prevent submission)
-    expect(screen.getByRole('button', { name: /upload/i })).toBeInTheDocument()
+    // Add a file
+    const fileInput = screen.getByLabelText(/error screenshot/i)
+    const file = new File(['test'], 'test.png', { type: 'image/png' })
+    fireEvent.change(fileInput, { target: { files: [file] } })
+    
+    // Button should now be enabled
+    await waitFor(() => {
+      expect(uploadButton).not.toBeDisabled()
+    })
   })
 })

@@ -25,13 +25,10 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 
 describe('/api/upload', () => {
-  it('handles upload without extracted_text field', async () => {
+  it('handles simplified upload with just image and caption', async () => {
     const formData = new FormData()
     formData.append('file', new File(['test'], 'test.png', { type: 'image/png' }))
-    formData.append('title', 'Test Error Post')
-    formData.append('language', 'JavaScript')
-    formData.append('error_type', 'Runtime Error')
-    formData.append('tags', 'test,error')
+    formData.append('title', 'This error makes me want to cry!')
 
     const request = new Request('http://localhost:3000/api/upload', {
       method: 'POST',
@@ -62,9 +59,10 @@ describe('/api/upload', () => {
     expect(data.error).toBe('Missing file')
   })
 
-  it('rejects upload without title', async () => {
+  it('handles upload without caption (uses default title)', async () => {
     const formData = new FormData()
     formData.append('file', new File(['test'], 'test.png', { type: 'image/png' }))
+    // No title/caption provided
 
     const request = new Request('http://localhost:3000/api/upload', {
       method: 'POST',
@@ -74,7 +72,9 @@ describe('/api/upload', () => {
     const response = await POST(request)
     const data = await response.json()
 
-    expect(response.status).toBe(400)
-    expect(data.error).toBe('Missing title')
+    // Should succeed with default title
+    expect(response.status).toBe(200)
+    expect(data.ok).toBe(true)
+    expect(data.image_url).toBeDefined()
   })
 })
