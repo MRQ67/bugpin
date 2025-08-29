@@ -17,7 +17,6 @@ export type ErrorPost = {
   id: UUID
   title: string
   image_url: string
-  extracted_text: string | null
   language: string | null
   error_type: string | null
   tags: string[] | null

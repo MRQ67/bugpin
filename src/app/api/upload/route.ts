@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createActionClient } from '@/lib/supabase/server'
 
 export async function POST(req: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = await createActionClient()
 
     const {
       data: { user },
@@ -18,7 +18,6 @@ export async function POST(req: Request) {
     const language = (form.get('language') as string) || null
     const error_type = (form.get('error_type') as string) || null
     const tagsRaw = (form.get('tags') as string) || ''
-    const extracted_text = (form.get('extracted_text') as string) || null
 
     if (!file) return NextResponse.json({ error: 'Missing file' }, { status: 400 })
     if (!title.trim()) return NextResponse.json({ error: 'Missing title' }, { status: 400 })
@@ -45,7 +44,6 @@ export async function POST(req: Request) {
     const { error: insertError } = await supabase.from('error_posts').insert({
       title: title.trim(),
       image_url: publicUrl,
-      extracted_text,
       language,
       error_type,
       tags,

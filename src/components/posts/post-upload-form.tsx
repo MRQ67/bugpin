@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { runOCR } from '@/lib/ocr'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -22,10 +21,6 @@ export default function PostUploadForm() {
   const [language, setLanguage] = useState('')
   const [errorType, setErrorType] = useState('')
   const [tags, setTags] = useState('')
-  const [ocrProgress, setOcrProgress] = useState(0)
-  const [ocrStatus, setOcrStatus] = useState<'idle' | 'starting' | 'running' | 'done' | 'error'>('idle')
-  const [ocrText, setOcrText] = useState('')
-  const ocrPromiseRef = useRef<Promise<string> | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
 
@@ -33,37 +28,6 @@ export default function PostUploadForm() {
     const f = e.target.files?.[0] ?? null
     setFile(f)
     setPreview(f ? URL.createObjectURL(f) : null)
-    setOcrText('')
-    setOcrProgress(0)
-    setOcrStatus('idle')
-
-    // Kick off OCR early to reduce perceived wait on submit
-    if (f) {
-      setOcrStatus('starting')
-      const p = (async () => {
-        try {
-          const { text } = await runOCR(f, {
-            onProgress: (p) => {
-              // First progress events may come only after worker/core loads
-              setOcrStatus('running')
-              setOcrProgress(p)
-            },
-          })
-          setOcrText(text)
-          setOcrStatus('done')
-          return text
-        } catch (err) {
-          console.error('OCR failed', err)
-          setOcrStatus('error')
-          return ''
-        } finally {
-          ocrPromiseRef.current = null
-        }
-      })()
-      ocrPromiseRef.current = p
-    } else {
-      ocrPromiseRef.current = null
-    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,30 +59,12 @@ export default function PostUploadForm() {
         data: { publicUrl },
       } = supabase.storage.from('uploads').getPublicUrl(filePath)
 
-      // 2) Use OCR result. If not finished yet, wait for the in-flight OCR.
-      let extracted_text = ocrText
-      if (!extracted_text) {
-        if (ocrPromiseRef.current) {
-          setOcrStatus('running')
-          extracted_text = await ocrPromiseRef.current
-        } else {
-          // Fallback: run OCR now
-          setOcrStatus('starting')
-          const { text } = await runOCR(file, {
-            onProgress: (p) => setOcrProgress(p),
-          })
-          extracted_text = text
-          setOcrStatus('done')
-        }
-      }
-
-      // 3) Insert post and get its id
+      // 2) Insert post and get its id
       const { data: inserted, error: insertError } = await supabase
         .from('error_posts')
         .insert({
         title: title.trim(),
         image_url: publicUrl,
-        extracted_text,
         language: language || null,
         error_type: errorType || null,
         tags: tags
@@ -131,16 +77,13 @@ export default function PostUploadForm() {
         .single()
       if (insertError) throw insertError
 
-      // 4) Reset
+      // 3) Reset
       setFile(null)
       setTitle('')
       setLanguage('')
       setErrorType('')
       setTags('')
       setPreview(null)
-      setOcrProgress(0)
-      setOcrStatus('idle')
-      setOcrText('')
       // Navigate to the new post for immediate feedback
       if (inserted?.id) {
         router.push(`/posts/${inserted.id}`)
@@ -189,12 +132,7 @@ export default function PostUploadForm() {
         </div>
       </div>
 
-      <div className="text-sm text-muted-foreground min-h-5">
-        {ocrStatus === 'starting' && 'Preparing OCR worker…'}
-        {ocrStatus === 'running' && `OCR progress: ${(ocrProgress * 100).toFixed(0)}%`}
-        {ocrStatus === 'done' && 'OCR complete'}
-        {ocrStatus === 'error' && 'OCR failed. You can still submit without extracted text.'}
-      </div>
+
 
       <Button type="submit" disabled={submitting} className="w-full">
         {submitting ? 'Uploading…' : 'Upload'}

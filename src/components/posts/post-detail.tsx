@@ -45,13 +45,7 @@ export default function PostDetail({ post }: { post: ErrorPost & { author?: Auth
         <div className="pt-1">
           <LikeButton postId={post.id} initialCount={post.likes_count ?? 0} />
         </div>
-        {post.extracted_text ? (
-          <pre className="whitespace-pre-wrap text-sm p-3 rounded border bg-card overflow-auto">
-            {post.extracted_text}
-          </pre>
-        ) : (
-          <p className="text-sm text-muted-foreground">No OCR text extracted.</p>
-        )}
+
         <section className="space-y-3">
           <h2 className="text-lg font-medium">Comments</h2>
           <CommentForm postId={post.id} />
