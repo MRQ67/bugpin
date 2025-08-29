@@ -28,12 +28,6 @@ The database uses Supabase and consists of the following tables with Row Level S
 
 ## 4. Development Roadmap & Tasks
 
-### Current Status
-- [x] Initial project setup and dependency installation.
-- [x] Core Supabase schema and RLS policies defined.
-- [x] Basic UI components and layout structure in place.
-- [x] Client-side OCR and post upload functionality implemented.
-
 ### Suggested Improvements (Next Steps)
 
 Here are the next tasks to improve the project's robustness, performance, and user experience.
@@ -47,7 +41,17 @@ Here are the next tasks to improve the project's robustness, performance, and us
     - [ ] Remove the client-side `runOCR` call and related logic from `src/components/posts/post-upload-form.tsx`.
     - [ ] Update the form to show a loading state while the backend processes the image.
 
-#### B. Implement Automated Testing
+#### B. Enhance Form Validation & UX
+**Goal:** Replace `alert()` with modern notifications and add robust, user-friendly form validation.
+
+- [ ] **To-Do:**
+    - [ ] Replace all `alert()` calls in `post-upload-form.tsx` with `toast()` from the `sonner` library.
+    - [ ] Create a Zod schema for the upload form's data to define validation rules.
+    - [ ] Integrate `react-hook-form` with the Zod schema using `@hookform/resolvers`.
+    - [ ] Refactor the `post-upload-form.tsx` to use `react-hook-form` for state management and validation.
+    - [ ] Display inline error messages for each form field upon validation failure.
+
+#### C. Implement Automated Testing
 **Goal:** Add a testing framework to ensure code quality and prevent regressions.
 
 - [ ] **To-Do:**
@@ -57,16 +61,6 @@ Here are the next tasks to improve the project's robustness, performance, and us
     - [ ] Write an initial unit test for a utility function (e.g., in `src/lib/utils.ts`).
     - [ ] Write a simple component test to ensure a UI component renders (e.g., `src/components/ui/button.tsx`).
     - [ ] Write an API test for the `/api/upload` route to check error handling.
-
-#### C. Enhance Form Validation & UX
-**Goal:** Replace `alert()` with modern notifications and add robust, user-friendly form validation.
-
-- [ ] **To-Do:**
-    - [ ] Replace all `alert()` calls in `post-upload-form.tsx` with `toast()` from the `sonner` library.
-    - [ ] Create a Zod schema for the upload form's data to define validation rules.
-    - [ ] Integrate `react-hook-form` with the Zod schema using `@hookform/resolvers`.
-    - [ ] Refactor the `post-upload-form.tsx` to use `react-hook-form` for state management and validation.
-    - [ ] Display inline error messages for each form field upon validation failure.
 
 #### D. Secure Environment Variables
 **Goal:** Securely manage Supabase credentials and other secrets, ensuring they are not committed to version control.
@@ -84,19 +78,47 @@ Here are the next tasks to improve the project's robustness, performance, and us
     - [ ] Import and use this type in `post-upload-form.tsx` and any other components that handle post data.
     - [ ] Use the `ErrorPost` type in the `/api/upload/route.ts` to typecheck the data being inserted.
 
-#### F. Enhance Search Bar UI
-**Goal:** Improve the search bar design to provide a better user experience.
+#### F. Make a Profile Page for Users
+**Goal:** Create a public profile page for each user that displays their posts and other information.
 
-- [x] **Done:**
-    - [x] Replaced the default search bar with a new design inspired by the provided reference image.
-    - [x] Ensured the new search bar is responsive and functional, adapting to different screen sizes.
-    - [x] Integrated the new design with the existing search functionality.
+- [ ] **To-Do:**
+    - [ ] Create a new page at `src/app/profile/[username]/page.tsx`.
+    - [ ] Fetch the user's profile information and posts from Supabase based on the `username` parameter.
+    - [ ] Create a new `Profile` component to display the user's information, including their avatar, username, and bio.
+    - [ ] Display the user's posts in a grid on their profile page.
 
-#### G. Migrate from `@next/font` to `next/font`
-**Goal:** Update the project to use the built-in `next/font` and remove the deprecated `@next/font` package to align with Next.js 14 standards.
+#### G. Optimize the Connection Between the Front End and Supabase
+**Goal:** Improve the performance and efficiency of data fetching from Supabase.
 
-- [x] **Done:**
-    - [x] Run the `built-in-next-font` codemod to automatically update import paths.
-    - [x] Verify the changes made by the codemod in the codebase.
-    - [x] Uninstall the `@next/font` package.
-    - [x] Run `npm install` to update the lockfile.
+- [ ] **To-Do:**
+    - [ ] Analyze the existing Supabase queries and identify any bottlenecks.
+    - [ ] Implement caching strategies to reduce the number of requests to the database.
+    - [ ] Use `react-query` or a similar library to manage data fetching, caching, and synchronization.
+    - [ ] Optimize the database schema and queries for better performance.
+
+#### H. Change the Date and Time on the Comments to Elapsed Period of Time from the Current Time
+**Goal:** Display the time of a comment as a relative time (e.g., "2 hours ago") instead of a static date and time.
+
+- [ ] **To-Do:**
+    - [ ] Use a library like `date-fns` or `dayjs` to calculate the relative time.
+    - [ ] Create a new component to display the relative time.
+    - [ ] Replace the existing date and time display with the new relative time component in the `CommentList` component.
+
+#### I. Add Smooth Transition Between Floating Nav & a Nav Bar
+**Goal:** Create a seamless transition between the floating navigation bar and a standard, fixed navigation bar when the user scrolls.
+
+- [ ] **To-Do:**
+    - [ ] Create a new state to track the scroll position of the page.
+    - [ ] Conditionally render either the `FloatingNavbar` or a standard `Navbar` component based on the scroll position.
+    - [ ] Use a library like `framer-motion` to animate the transition between the two navigation bars.
+    - [ ] Ensure the transition is smooth and performant.
+
+### Completed Tasks
+
+- [x] **Initial project setup and dependency installation.**
+- [x] **Core Supabase schema and RLS policies defined.**
+- [x] **Basic UI components and layout structure in place.**
+- [x] **Client-side OCR and post upload functionality implemented.**
+- [x] **Enhance Search Bar UI**
+- [x] **Migrate from `@next/font` to `next/font`**
+- [x] **Implement Pinterest-Style Masonry Layout for Homepage**

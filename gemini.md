@@ -29,3 +29,4 @@
 - UI should remain consistent with the existing `shadcn/ui` implementation.
 - Always check the DEVELOPMENT_PLAN.md file before doing any task to if the task asked is available if not add it and after finishing it mark it as complete
 - Only use the gemini.md file located in the current project directory, not the global C:\Users\kasab\.gemini\GEMINI.md file.
+- Only use tailwindcss instead of writing custom css

@@ -78,6 +78,10 @@ small, .text-sm {
   }
 }
 
+.masonry-grid_column {
+  @apply flex flex-col gap-4 bg-clip-padding;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

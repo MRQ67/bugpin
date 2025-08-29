@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import PostGrid from '@/components/posts/post-grid'
 import SearchBar from '@/components/common/search-bar'
+import TagBar from '@/components/common/tag-bar'
 
 export const revalidate = 0
 
@@ -29,6 +30,7 @@ export default async function Home({
 
   return (
     <div className="container mx-auto px-4 py-4">
+      <TagBar />
       <PostGrid posts={(posts ?? []) as any} />
     </div>
   )

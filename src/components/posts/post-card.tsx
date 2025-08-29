@@ -8,7 +8,7 @@ export default function PostCard({ post }: { post: ErrorPost }) {
       href={`/posts/${post.id}`}
       className="group block overflow-hidden rounded-lg border bg-card hover:shadow-md transition-shadow"
     >
-      <div className="aspect-square w-full overflow-hidden bg-muted">
+      <div className="w-full overflow-hidden bg-muted">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={post.image_url}
@@ -17,9 +17,9 @@ export default function PostCard({ post }: { post: ErrorPost }) {
           loading="lazy"
         />
       </div>
-      <div className="p-3 space-y-2">
+      <div className="p-3">
         <div className="text-sm font-medium line-clamp-2">{post.title}</div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-2">
           {post.language && <Badge variant="secondary">{post.language}</Badge>}
           {post.error_type && <Badge variant="outline">{post.error_type}</Badge>}
         </div>
