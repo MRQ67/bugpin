@@ -21,8 +21,7 @@ export default function CommentList({ postId }: { postId: string }) {
   useEffect(() => {
     let mounted = true
 
-    const fetchInitial = async () => {
-      setLoading(true)
+    const fetchComments = async () => {
       const { data, error } = await supabase
         .from('comments')
         .select('id, content, created_at, user_id')
@@ -31,6 +30,7 @@ export default function CommentList({ postId }: { postId: string }) {
       if (!mounted) return
       if (error) {
         console.error('Load comments error', error)
+        return
       }
       const list = (data ?? []) as Item[]
       setItems(list)
@@ -54,10 +54,22 @@ export default function CommentList({ postId }: { postId: string }) {
           setProfiles(map)
         }
       }
-      setLoading(false)
+    }
+
+    const fetchInitial = async () => {
+      setLoading(true)
+      await fetchComments()
+      if (mounted) setLoading(false)
     }
 
     fetchInitial()
+
+    // Set up polling as a fallback (every 5 seconds)
+    const pollInterval = setInterval(() => {
+      if (mounted) {
+        fetchComments()
+      }
+    }, 5000)
 
     const channel = supabase
       .channel(`comments:${postId}`)
@@ -65,11 +77,18 @@ export default function CommentList({ postId }: { postId: string }) {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'comments', filter: `error_post_id=eq.${postId}` },
         (payload: any) => {
+          console.log('Comment real-time event:', payload.eventType, payload)
           if (payload.eventType === 'INSERT') {
             const inserted = payload.new as Item
-            setItems((prev) => [...prev, inserted])
+            setItems((prev) => {
+              // Avoid duplicates
+              if (prev.some(item => item.id === inserted.id)) {
+                return prev
+              }
+              return [...prev, inserted]
+            })
             const uid = (inserted as any).user_id
-            if (uid && !profiles[uid]) {
+            if (uid) {
               // lazy-load missing profile
               supabase
                 .from('profiles')
@@ -95,10 +114,13 @@ export default function CommentList({ postId }: { postId: string }) {
           }
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        console.log('Comment subscription status:', status)
+      })
 
     return () => {
       mounted = false
+      clearInterval(pollInterval)
       supabase.removeChannel(channel)
     }
   }, [postId, supabase])

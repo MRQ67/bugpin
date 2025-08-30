@@ -14,13 +14,16 @@ export default function LikeButton({ postId, initialCount = 0 }: { postId: strin
 
   useEffect(() => {
     let mounted = true
+    let currentUserId: string | null = null
 
     const bootstrap = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser()
       if (!mounted) return
-      setUserId(user?.id ?? null)
+      
+      currentUserId = user?.id ?? null
+      setUserId(currentUserId)
 
       const [{ data: myLike }, countRes] = await Promise.all([
         user
@@ -44,9 +47,9 @@ export default function LikeButton({ postId, initialCount = 0 }: { postId: strin
         (payload: any) => {
           if (payload.eventType === 'INSERT') setCount((c) => c + 1)
           if (payload.eventType === 'DELETE') setCount((c) => Math.max(0, c - 1))
-          if (userId) {
-            if (payload.eventType === 'INSERT' && (payload.new as any).user_id === userId) setLiked(true)
-            if (payload.eventType === 'DELETE' && (payload.old as any).user_id === userId) setLiked(false)
+          if (currentUserId) {
+            if (payload.eventType === 'INSERT' && (payload.new as any).user_id === currentUserId) setLiked(true)
+            if (payload.eventType === 'DELETE' && (payload.old as any).user_id === currentUserId) setLiked(false)
           }
         }
       )
@@ -56,7 +59,7 @@ export default function LikeButton({ postId, initialCount = 0 }: { postId: strin
       mounted = false
       supabase.removeChannel(channel)
     }
-  }, [postId, supabase, initialCount, userId])
+  }, [postId, supabase, initialCount])
 
   const toggle = async () => {
     if (!userId) {

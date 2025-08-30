@@ -1,12 +1,15 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Upload, Image as ImageIcon } from 'lucide-react'
+import { Upload, Image as ImageIcon, Shield, AlertTriangle, CheckCircle } from 'lucide-react'
+import { useContentModeration } from '@/hooks/use-content-moderation'
+import { ContentPolicyLink } from '@/components/moderation/content-policy'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 function randomName(ext: string) {
   return `${Math.random().toString(36).slice(2)}.${ext}`
@@ -15,22 +18,53 @@ function randomName(ext: string) {
 export default function PostUploadForm() {
   const router = useRouter()
   const supabase = createClient()
+  const { analyzeImage, preloadModel, isLoading: moderationLoading, modelLoaded, error: moderationError } = useContentModeration()
 
   const [file, setFile] = useState<File | null>(null)
   const [caption, setCaption] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
+  const [moderationStatus, setModerationStatus] = useState<'pending' | 'analyzing' | 'approved' | 'blocked' | null>(null)
+  const [moderationMessage, setModerationMessage] = useState<string>('')
+  const [showBypass, setShowBypass] = useState(false)
 
-  const handleFileSelect = (selectedFile: File) => {
+  // Preload the model when component mounts
+  useEffect(() => {
+    preloadModel()
+  }, [preloadModel])
+
+  const handleFileSelect = async (selectedFile: File) => {
     setFile(selectedFile)
     setPreview(URL.createObjectURL(selectedFile))
+    setModerationStatus('analyzing')
+    setModerationMessage('')
+    setShowBypass(false)
+
+    try {
+      // Analyze the image for inappropriate content
+      const result = await analyzeImage(selectedFile)
+      
+      if (result.isAppropriate) {
+        setModerationStatus('approved')
+        setModerationMessage('Image approved for upload')
+      } else {
+        setModerationStatus('blocked')
+        setModerationMessage(result.blockedReason || 'Content may not be appropriate for this platform')
+        setShowBypass(true)
+      }
+    } catch (error) {
+      console.error('Content moderation failed:', error)
+      // If moderation fails, allow upload but warn user
+      setModerationStatus('approved')
+      setModerationMessage('Content moderation unavailable - proceeding with upload')
+    }
   }
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
     if (selectedFile) {
-      handleFileSelect(selectedFile)
+      await handleFileSelect(selectedFile)
     }
   }
 
@@ -44,21 +78,32 @@ export default function PostUploadForm() {
     }
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
     
     const droppedFile = e.dataTransfer.files?.[0]
     if (droppedFile && droppedFile.type.startsWith('image/')) {
-      handleFileSelect(droppedFile)
+      await handleFileSelect(droppedFile)
     }
+  }
+
+  const handleBypass = () => {
+    setModerationStatus('approved')
+    setModerationMessage('Upload approved by user (please ensure content follows guidelines)')
+    setShowBypass(false)
   }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!file) {
       alert('Please select an image to upload.')
+      return
+    }
+
+    if (moderationStatus === 'blocked' && showBypass) {
+      alert('Please wait for content moderation to complete or address the content issue.')
       return
     }
 
@@ -128,8 +173,12 @@ export default function PostUploadForm() {
           className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
             dragActive
               ? 'border-primary bg-primary/5'
-              : preview
+              : moderationStatus === 'approved'
               ? 'border-green-300 bg-green-50'
+              : moderationStatus === 'blocked'
+              ? 'border-red-300 bg-red-50'
+              : preview
+              ? 'border-yellow-300 bg-yellow-50'
               : 'border-gray-300 hover:border-gray-400'
           }`}
           onDragEnter={handleDrag}
@@ -152,6 +201,9 @@ export default function PostUploadForm() {
                   onClick={() => {
                     setFile(null)
                     setPreview(null)
+                    setModerationStatus(null)
+                    setModerationMessage('')
+                    setShowBypass(false)
                   }}
                 >
                   Remove
@@ -194,6 +246,56 @@ export default function PostUploadForm() {
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
         </div>
+        
+        {/* Content Moderation Status */}
+        {(moderationStatus === 'analyzing' || moderationLoading) && (
+          <Alert>
+            <Shield className="h-4 w-4 animate-pulse" />
+            <AlertDescription>
+              Checking image content... This helps keep BugPin safe and professional.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {moderationStatus === 'approved' && (
+          <Alert>
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-700">
+              {moderationMessage}
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {moderationStatus === 'blocked' && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              {moderationMessage}
+              {showBypass && (
+                <div className="mt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleBypass}
+                    className="text-xs"
+                  >
+                    This is a coding screenshot - Continue anyway
+                  </Button>
+                </div>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {moderationError && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Content moderation error: {moderationError}
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
       {/* Caption Area */}
@@ -212,16 +314,24 @@ export default function PostUploadForm() {
         </p>
       </div>
 
+      {/* Content Policy */}
+      <ContentPolicyLink />
+
       {/* Upload Button */}
       <Button 
         type="submit" 
-        disabled={submitting || !file} 
+        disabled={submitting || !file || (moderationStatus === 'blocked' && showBypass) || moderationStatus === 'analyzing'} 
         className="w-full h-12 text-lg font-medium"
       >
         {submitting ? (
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             <span>Uploading...</span>
+          </div>
+        ) : moderationStatus === 'analyzing' ? (
+          <div className="flex items-center space-x-2">
+            <Shield className="w-4 h-4 animate-pulse" />
+            <span>Checking Content...</span>
           </div>
         ) : (
           <div className="flex items-center space-x-2">

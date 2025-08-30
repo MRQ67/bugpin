@@ -1,14 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
 export default function CommentForm({ postId }: { postId: string }) {
   const supabase = createClient()
-  const router = useRouter()
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -64,16 +62,16 @@ export default function CommentForm({ postId }: { postId: string }) {
         profile = newProfile
       }
       
-      const { error } = await supabase.from('comments').insert({
+      const { data: insertedComment, error } = await supabase.from('comments').insert({
         content: text,
         error_post_id: postId,
         user_id: user.id,
-      })
+      }).select().single()
       
       if (error) throw error
+      console.log('Comment inserted successfully:', insertedComment)
       setContent('')
-      // Revalidate server components and show the new comment
-      router.refresh()
+      // Real-time subscription will handle showing the new comment automatically
     } catch (e: any) {
       // Surface better diagnostics
       const msg = e?.message || e?.error_description || 'Unknown error'

@@ -27,16 +27,25 @@ export default async function PostPage({
 
   if (error || !post) return notFound()
 
-  // Fetch author profile
-  const { data: author } = await supabase
-    .from('profiles')
-    .select('id, name, username, avatar_url')
-    .eq('id', (post as any).user_id)
-    .single()
+  // Fetch author profile and current likes count
+  const [{ data: author }, { count: likesCount }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('id, name, username, avatar_url')
+      .eq('id', (post as any).user_id)
+      .single(),
+    supabase
+      .from('likes')
+      .select('id', { count: 'exact', head: true })
+      .eq('error_post_id', id)
+  ])
+
+  // Update the post with the current likes count
+  const postWithLikes = { ...(post as any), likes_count: likesCount ?? 0, author }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <PostDetail post={{ ...(post as any), author }} />
+      <PostDetail post={postWithLikes} />
     </div>
   )
 }
