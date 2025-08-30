@@ -1,8 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { type ErrorPost } from '@/lib/types'
 import LikeButton from '@/components/posts/like-button'
-import CommentForm from '@/components/comments/comment-form'
-import CommentList from '@/components/comments/comment-list'
+import OptimisticComments from '@/components/comments/optimistic-comments'
 import { RelativeTime } from '@/components/ui/relative-time'
 
 type Author = { id: string; name: string | null; username: string | null; avatar_url: string | null } | null
@@ -55,8 +54,7 @@ export default function PostDetail({ post }: { post: ErrorPost & { author?: Auth
 
         <section className="space-y-3">
           <h2 className="text-lg font-medium">Comments</h2>
-          <CommentForm postId={post.id} />
-          <CommentList postId={post.id} />
+          <OptimisticComments postId={post.id} />
         </section>
       </div>
     </article>

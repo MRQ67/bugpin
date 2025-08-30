@@ -6,10 +6,13 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { Upload, Image as ImageIcon, Shield, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Upload, Image as ImageIcon, Shield, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react'
 import { useContentModeration } from '@/hooks/use-content-moderation'
+import { useOptimisticUpload } from '@/hooks/use-optimistic-upload'
 import { ContentPolicyLink } from '@/components/moderation/content-policy'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Progress } from '@/components/ui/progress'
+import { cn } from '@/lib/utils'
 
 function randomName(ext: string) {
   return `${Math.random().toString(36).slice(2)}.${ext}`
@@ -18,11 +21,11 @@ function randomName(ext: string) {
 export default function PostUploadForm() {
   const router = useRouter()
   const supabase = createClient()
-  const { analyzeImage, preloadModel, isLoading: moderationLoading, modelLoaded, error: moderationError } = useContentModeration()
+  const { analyzeImage, preloadModel, isLoading: moderationLoading, error: moderationError } = useContentModeration()
+  const { uploadPost, uploadProgress, isUploading, resetUpload } = useOptimisticUpload()
 
   const [file, setFile] = useState<File | null>(null)
   const [caption, setCaption] = useState('')
-  const [submitting, setSubmitting] = useState(false)
   const [preview, setPreview] = useState<string | null>(null)
   const [dragActive, setDragActive] = useState(false)
   const [moderationStatus, setModerationStatus] = useState<'pending' | 'analyzing' | 'approved' | 'blocked' | null>(null)
@@ -107,9 +110,8 @@ export default function PostUploadForm() {
       return
     }
 
-    setSubmitting(true)
     try {
-      // 1) Get user
+      // Get user
       const {
         data: { user },
         error: userErr,
@@ -117,50 +119,24 @@ export default function PostUploadForm() {
       if (userErr) throw userErr
       if (!user) throw new Error('Not authenticated')
 
-      // 2) Upload image to Supabase Storage
-      const ext = file.name.split('.').pop() || 'png'
-      const filePath = `error-images/${randomName(ext)}`
-      
-      const { error: uploadError } = await supabase.storage
-        .from('uploads')
-        .upload(filePath, file)
-      
-      if (uploadError) throw uploadError
+      // Upload with optimistic feedback
+      const result = await uploadPost(file, caption, user.id)
 
-      // 3) Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('uploads')
-        .getPublicUrl(filePath)
-
-      // 4) Insert post
-      const { data: inserted, error: insertError } = await supabase
-        .from('error_posts')
-        .insert({
-          title: caption.trim() || 'Untitled Error',
-          image_url: publicUrl,
-          language: null,
-          error_type: null,
-          tags: null,
-          user_id: user.id,
-        })
-        .select('id')
-        .single()
-
-      if (insertError) throw insertError
-      if (!inserted?.id) throw new Error('Failed to create post')
-
-      // 5) Reset form
+      // Reset form
       setFile(null)
       setCaption('')
       setPreview(null)
+      setModerationStatus(null)
+      setModerationMessage('')
+      setShowBypass(false)
 
-      // 6) Navigate to the new post
-      router.push(`/posts/${inserted.id}`)
+      // Navigate to the new post after a brief delay to show success
+      setTimeout(() => {
+        router.push(`/posts/${result.postId}`)
+      }, 1000)
     } catch (err: any) {
       console.error('Upload failed:', err)
-      alert(`Upload failed: ${err.message}`)
-    } finally {
-      setSubmitting(false)
+      // Error handling is done in the optimistic hook
     }
   }
 
@@ -317,16 +293,44 @@ export default function PostUploadForm() {
       {/* Content Policy */}
       <ContentPolicyLink />
 
+      {/* Upload Progress */}
+      {isUploading && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">{uploadProgress.message}</span>
+            <span className="text-sm text-muted-foreground">{uploadProgress.progress}%</span>
+          </div>
+          <Progress value={uploadProgress.progress} className="h-3" />
+          <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>
+              {uploadProgress.stage === 'moderating' && 'Checking content...'}
+              {uploadProgress.stage === 'uploading' && 'Uploading image...'}
+              {uploadProgress.stage === 'processing' && 'Processing...'}
+              {uploadProgress.stage === 'complete' && 'Upload complete!'}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Upload Button */}
       <Button 
         type="submit" 
-        disabled={submitting || !file || (moderationStatus === 'blocked' && showBypass) || moderationStatus === 'analyzing'} 
-        className="w-full h-12 text-lg font-medium"
+        disabled={isUploading || !file || (moderationStatus === 'blocked' && showBypass) || moderationStatus === 'analyzing'} 
+        className={cn(
+          "w-full h-12 text-lg font-medium transition-all duration-200",
+          uploadProgress.stage === 'complete' && "bg-green-600 hover:bg-green-700"
+        )}
       >
-        {submitting ? (
+        {isUploading ? (
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            <span>Uploading...</span>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>{uploadProgress.message || 'Uploading...'}</span>
+          </div>
+        ) : uploadProgress.stage === 'complete' ? (
+          <div className="flex items-center space-x-2">
+            <CheckCircle className="w-5 h-5" />
+            <span>Upload Complete!</span>
           </div>
         ) : moderationStatus === 'analyzing' ? (
           <div className="flex items-center space-x-2">
@@ -340,6 +344,26 @@ export default function PostUploadForm() {
           </div>
         )}
       </Button>
+
+      {/* Error State */}
+      {uploadProgress.stage === 'error' && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            {uploadProgress.message}
+            <div className="mt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={resetUpload}
+              >
+                Try Again
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
     </form>
   )
 }
