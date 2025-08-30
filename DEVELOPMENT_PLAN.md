@@ -32,6 +32,114 @@ The database uses Supabase and consists of the following tables with Row Level S
 
 Here are the next tasks to improve the project's robustness, performance, and user experience.
 
+#### L. Implement Client-Side Image Filtering with NSFWJS
+**Goal:** Protect the platform from explicit/inappropriate content using client-side AI moderation that's perfect for a portfolio project - free, fast, and demonstrates ML integration skills.
+
+**Why NSFWJS for Portfolio Projects:**
+- **Zero Cost**: No API fees or usage limits - perfect for portfolio traffic
+- **No External Dependencies**: Runs entirely client-side, no API key management
+- **Fast & Responsive**: Instant feedback to users, no network latency
+- **Privacy-Friendly**: Images never leave the user's browser for moderation
+- **Portfolio Value**: Shows TensorFlow.js and client-side AI skills
+- **Easy to Demo**: Reviewers can test immediately without API concerns
+
+**Technical Approach:**
+NSFWJS uses TensorFlow.js to run a pre-trained neural network in the browser that classifies images into 5 categories:
+- **Drawing**: Hand-drawn or illustrated content
+- **Hentai**: Animated explicit content
+- **Neutral**: Safe, appropriate content
+- **Porn**: Explicit photographic content
+- **Sexy**: Suggestive but not explicit content
+
+**Implementation Strategy:**
+- Integrate NSFWJS into the upload form component
+- Analyze images before upload and block high-confidence explicit content
+- Provide clear user feedback and content policy information
+- Add configurable confidence thresholds for different categories
+
+- [ ] **To-Do:**
+    - [ ] **Setup & Dependencies:**
+        - [ ] Install NSFWJS and TensorFlow.js dependencies (`npm install nsfwjs @tensorflow/tfjs`)
+        - [ ] Configure TensorFlow.js for optimal browser performance
+        - [ ] Test model loading and basic functionality
+    
+    - [ ] **Integration with Upload Form:**
+        - [ ] Add NSFWJS model loading to upload form component
+        - [ ] Implement image analysis before file upload
+        - [ ] Add loading states during image analysis ("Checking image...")
+        - [ ] Handle model loading errors gracefully
+        - [ ] Optimize for mobile device performance
+    
+    - [ ] **Content Filtering Logic:**
+        - [ ] Define confidence thresholds for each category:
+          - Porn: Block if confidence > 0.7
+          - Hentai: Block if confidence > 0.8
+          - Sexy: Block if confidence > 0.9 (more lenient for coding errors)
+        - [ ] Implement filtering logic with clear decision rules
+        - [ ] Add bypass for false positives (with user confirmation)
+        - [ ] Log moderation decisions for analysis (client-side only)
+    
+    - [ ] **User Experience:**
+        - [ ] Design clear error messages for blocked content
+        - [ ] Create content policy page explaining guidelines
+        - [ ] Add progress indicator during image analysis
+        - [ ] Implement "This seems like a mistake?" feedback option
+        - [ ] Provide examples of acceptable vs unacceptable content
+        - [ ] Add helpful tips for avoiding false positives
+    
+    - [ ] **Performance Optimization:**
+        - [ ] Implement model caching to avoid re-downloading
+        - [ ] Add image resizing before analysis to improve speed
+        - [ ] Use web workers for analysis to avoid UI blocking
+        - [ ] Optimize bundle size and loading performance
+        - [ ] Add fallback for browsers without TensorFlow.js support
+    
+    - [ ] **Configuration & Settings:**
+        - [ ] Create configurable confidence thresholds
+        - [ ] Add environment variables for model settings
+        - [ ] Implement admin override for testing
+        - [ ] Add debug mode for development
+        - [ ] Create A/B testing capability for thresholds
+    
+    - [ ] **Testing & Quality Assurance:**
+        - [ ] Test with various image types and formats
+        - [ ] Validate accuracy with known test images
+        - [ ] Test performance on different devices and browsers
+        - [ ] Ensure graceful degradation if model fails to load
+        - [ ] Test user experience flows for blocked content
+        - [ ] Verify no impact on existing upload functionality
+    
+    - [ ] **Documentation & Policies:**
+        - [ ] Create clear content policy and community guidelines
+        - [ ] Document moderation approach for portfolio reviewers
+        - [ ] Add FAQ section for common questions
+        - [ ] Update terms of service with content guidelines
+        - [ ] Create transparency about automated moderation
+
+**Expected Benefits:**
+- **Platform Safety**: Effective protection from explicit content
+- **Zero Operational Cost**: No ongoing API fees or service management
+- **Fast User Experience**: Instant feedback without server round-trips
+- **Privacy Protection**: Images analyzed locally, never sent to third parties
+- **Portfolio Demonstration**: Shows practical AI/ML integration skills
+- **Scalability**: Client-side processing scales with users automatically
+
+**Technical Considerations:**
+- **Accuracy**: ~90%+ for basic NSFW detection (sufficient for portfolio)
+- **Performance**: ~1-3 seconds analysis time on modern devices
+- **Bundle Size**: ~2-3MB additional JavaScript (acceptable for modern web)
+- **Browser Support**: Works in all modern browsers with JavaScript enabled
+- **Fallback Strategy**: Allow uploads if moderation fails (with warning)
+
+**Future Scaling Notes:**
+For production scale-up, this approach could be enhanced with:
+- Server-side validation using Hive AI or similar professional APIs
+- Human review workflow for edge cases
+- More sophisticated content categories (violence, hate speech, etc.)
+- Database logging and analytics for moderation decisions
+
+This demonstrates both practical implementation skills and architectural thinking about scaling considerations - perfect for portfolio discussions!
+
 #### A. ~~Refactor OCR to Backend~~ (OBSOLETE - OCR Removed)
 **Status:** This task is no longer relevant as OCR functionality has been completely removed from the project to improve simplicity and reliability.
 
@@ -90,13 +198,45 @@ Here are the next tasks to improve the project's robustness, performance, and us
     - [ ] Use `react-query` or a similar library to manage data fetching, caching, and synchronization.
     - [ ] Optimize the database schema and queries for better performance.
 
-#### H. Change the Date and Time on the Comments to Elapsed Period of Time from the Current Time
-**Goal:** Display the time of a comment as a relative time (e.g., "2 hours ago") instead of a static date and time.
+#### H. ✅ Implement Relative Time Display for Posts and Comments (COMPLETED)
+**Goal:** Display the time of posts and comments as relative time (e.g., "2 hours ago", "3 days ago") instead of static date and time, improving readability and user experience.
 
-- [ ] **To-Do:**
-    - [ ] Use a library like `date-fns` or `dayjs` to calculate the relative time.
-    - [ ] Create a new component to display the relative time.
-    - [ ] Replace the existing date and time display with the new relative time component in the `CommentList` component.
+**✅ Implementation Completed:**
+Successfully implemented relative time display across all post and comment components using date-fns library.
+
+**✅ Features Implemented:**
+- **RelativeTime Component**: Created reusable component with proper TypeScript types
+- **Smart Time Display**: Shows relative time for recent content, absolute dates for old content (>1 year)
+- **Hover Tooltips**: Full date/time shown on hover for precise information
+- **Auto-Updates**: Recent content (<24 hours) automatically updates every minute
+- **Error Handling**: Graceful handling of invalid dates and edge cases
+- **Performance Optimized**: Efficient updates and memory management
+
+**✅ Components Updated:**
+- **PostCard**: Added relative time display to homepage post cards
+- **PostDetail**: Added creation time to individual post pages
+- **CommentList**: Updated comment timestamps to use relative time
+- **Consistent Styling**: Uniform appearance across all components
+
+**✅ Technical Implementation:**
+- **Dependencies**: Installed date-fns library for robust date calculations
+- **Component Location**: `src/components/ui/relative-time.tsx`
+- **Features**: Tooltips, auto-refresh, fallback handling, accessibility support
+- **Integration**: Seamlessly integrated into existing post and comment components
+
+**✅ Benefits Achieved:**
+- **Better UX**: More intuitive time understanding ("2 hours ago" vs "2024-01-15 14:30:00")
+- **Social Media Feel**: Matches user expectations from other platforms
+- **Cleaner UI**: Shorter, more readable time stamps
+- **Dynamic Updates**: Time automatically updates as content ages
+- **Accessibility**: Proper semantic HTML with time elements and ARIA labels
+- **Performance**: Efficient rendering with minimal re-renders
+
+**✅ User Experience Improvements:**
+- **Homepage**: Post cards now show when each error was shared
+- **Post Details**: Clear indication of when posts were created
+- **Comments**: Easy to see comment recency and conversation flow
+- **Tooltips**: Hover for exact timestamps when precision is needed
 
 #### I. Add Smooth Transition Between Floating Nav & a Nav Bar
 **Goal:** Create a seamless transition between the floating navigation bar and a standard, fixed navigation bar when the user scrolls.
@@ -136,68 +276,34 @@ Here are the next tasks to improve the project's robustness, performance, and us
 - **Increased Engagement**: Emotional captions encourage community interaction
 - **Focus on Community**: Emphasizes sharing feelings rather than technical details
 
-#### K. Remove OCR Functionality - Simplify and Improve Reliability
+#### K. ✅ Remove OCR Functionality - Simplify and Improve Reliability (COMPLETED)
 **Goal:** Remove OCR (Optical Character Recognition) functionality to simplify the codebase, improve reliability, and reduce complexity for users.
 
-**Rationale:**
-- OCR often fails with blurry or low-quality error screenshots
-- Adds unnecessary complexity to the upload process
-- Resource-intensive processing that can slow down uploads
-- Users can provide context through captions instead
-- Simplifies the overall user experience
+**✅ Implementation Completed:**
+OCR functionality has been successfully removed from the project to improve simplicity and reliability.
 
-- [ ] **To-Do:**
-    - [ ] **Remove OCR Dependencies:**
-        - [ ] Remove `tesseract.js` from package.json dependencies
-        - [ ] Delete `src/lib/ocr.ts` file
-        - [ ] Delete `src/types/tesseract-js.d.ts` type definitions
-    
-    - [ ] **Update Database Schema:**
-        - [ ] Remove `extracted_text` field from ErrorPost type in `src/lib/types.ts`
-        - [ ] Create migration to drop `extracted_text` column from `error_posts` table
-        - [ ] Update any database queries that reference `extracted_text`
-    
-    - [ ] **Refactor Upload Form:**
-        - [ ] Remove all OCR-related state from `src/components/posts/post-upload-form.tsx`
-        - [ ] Remove OCR progress indicators and status displays
-        - [ ] Remove `runOCR` function calls and related logic
-        - [ ] Simplify upload flow to just handle image and form data
-        - [ ] Remove OCR-related loading states and error handling
-    
-    - [ ] **Update API Route:**
-        - [ ] Remove `extracted_text` parameter from `/api/upload/route.ts`
-        - [ ] Remove `extracted_text` from database insertion
-        - [ ] Simplify error handling by removing OCR-related errors
-    
-    - [ ] **Update Search Functionality:**
-        - [ ] Remove text-based search that relied on `extracted_text`
-        - [ ] Focus search on titles, tags, and other metadata
-        - [ ] Update search queries in `src/app/page.tsx`
-    
-    - [ ] **Clean Up UI Components:**
-        - [ ] Remove any OCR status displays from upload forms
-        - [ ] Remove OCR progress bars and related UI elements
-        - [ ] Update loading states to focus on image upload only
-    
-    - [ ] **Add Comprehensive Tests:**
-        - [ ] Test image upload without OCR processing
-        - [ ] Test post creation with simplified data structure
-        - [ ] Test search functionality without extracted text
-        - [ ] Test existing posts display correctly after OCR removal
-        - [ ] Test mobile upload experience
-        - [ ] Test error handling for upload failures
-    
-    - [ ] **Documentation Updates:**
-        - [ ] Update README to reflect OCR removal
-        - [ ] Update development plan to remove OCR references
-        - [ ] Update any API documentation
-
-**Expected Benefits:**
+**✅ Benefits Achieved:**
 - **Faster Uploads**: No waiting for OCR processing
-- **Better Reliability**: Eliminates OCR failure points
-- **Simpler Codebase**: Less complexity to maintain
-- **Better Mobile Experience**: Reduced processing on mobile devices
-- **Lower Server Costs**: No OCR processing overhead
+- **Better Reliability**: Eliminated OCR failure points
+- **Simpler Codebase**: Reduced complexity and maintenance overhead
+- **Better Mobile Experience**: No resource-intensive processing on mobile devices
+- **Improved User Experience**: Streamlined upload process without OCR delays
+- **Focus on Simplicity**: Users provide context through captions instead of relying on automated text extraction
+
+**✅ Technical Changes:**
+- **Dependencies**: Removed OCR-related packages and dependencies
+- **Upload Form**: Simplified to focus on image upload and caption only
+- **API Routes**: Streamlined without OCR processing logic
+- **Database**: No extracted_text field dependencies
+- **Search**: Focuses on titles, captions, and metadata instead of extracted text
+- **UI Components**: Clean interface without OCR progress indicators
+
+**Rationale for Removal:**
+- OCR often failed with blurry or low-quality error screenshots
+- Added unnecessary complexity to the upload process
+- Resource-intensive processing that slowed down uploads
+- Users can provide better context through captions
+- Simplified the overall user experience significantly
 
 ### Completed Tasks
 
@@ -208,6 +314,8 @@ Here are the next tasks to improve the project's robustness, performance, and us
 - [x] **OCR functionality removed for simplicity and reliability.**
 - [x] **Fixed Supabase cookie modification errors in Next.js 15.**
 - [x] **Simplified upload page to image + caption only with emotional focus.**
+- [x] **Removed OCR functionality to improve reliability and simplicity.**
+- [x] **Implemented relative time display for posts and comments.**
 - [x] **Enhance Search Bar UI**
 - [x] **Migrate from `@next/font` to `next/font`**
 - [x] **Implement Pinterest-Style Masonry Layout for Homepage**

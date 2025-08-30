@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { type ErrorPost } from '@/lib/types'
 import { Badge } from '@/components/ui/badge'
+import { RelativeTime } from '@/components/ui/relative-time'
 
 export default function PostCard({ post }: { post: ErrorPost }) {
   return (
@@ -19,9 +20,15 @@ export default function PostCard({ post }: { post: ErrorPost }) {
       </div>
       <div className="p-3">
         <div className="text-sm font-medium line-clamp-2">{post.title}</div>
-        <div className="flex items-center gap-2 mt-2">
-          {post.language && <Badge variant="secondary">{post.language}</Badge>}
-          {post.error_type && <Badge variant="outline">{post.error_type}</Badge>}
+        <div className="flex items-center justify-between gap-2 mt-2">
+          <div className="flex items-center gap-2">
+            {post.language && <Badge variant="secondary">{post.language}</Badge>}
+            {post.error_type && <Badge variant="outline">{post.error_type}</Badge>}
+          </div>
+          <RelativeTime 
+            date={post.created_at} 
+            className="text-xs text-muted-foreground"
+          />
         </div>
       </div>
     </Link>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { RelativeTime } from '@/components/ui/relative-time'
 
 type Item = {
   id: string
@@ -128,9 +129,12 @@ export default function CommentList({ postId }: { postId: string }) {
                   {userData?.username && (
                     <span className="text-xs text-muted-foreground">@{userData.username}</span>
                   )}
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {new Date(c.created_at).toLocaleString()}
-                  </span>
+                  <div className="ml-auto">
+                    <RelativeTime 
+                      date={c.created_at} 
+                      className="text-xs text-muted-foreground"
+                    />
+                  </div>
                 </div>
                 <div className="text-foreground whitespace-pre-wrap">{c.content}</div>
               </div>

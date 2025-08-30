@@ -3,6 +3,7 @@ import { type ErrorPost } from '@/lib/types'
 import LikeButton from '@/components/posts/like-button'
 import CommentForm from '@/components/comments/comment-form'
 import CommentList from '@/components/comments/comment-list'
+import { RelativeTime } from '@/components/ui/relative-time'
 
 type Author = { id: string; name: string | null; username: string | null; avatar_url: string | null } | null
 
@@ -15,21 +16,27 @@ export default function PostDetail({ post }: { post: ErrorPost & { author?: Auth
           <img src={post.image_url} alt={post.title} className="w-full h-auto object-contain" />
         </div>
         {/* Author info under the image */}
-        <div className="flex items-center gap-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.author?.avatar_url || '/next.svg'}
-            alt={(post.author?.name || post.author?.username || 'Author') as string}
-            className="h-8 w-8 rounded-full border object-cover bg-card"
-          />
-          <div className="text-sm">
-            <div className="font-medium leading-tight">
-              {post.author?.name || post.author?.username || 'Unknown user'}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.author?.avatar_url || '/next.svg'}
+              alt={(post.author?.name || post.author?.username || 'Author') as string}
+              className="h-8 w-8 rounded-full border object-cover bg-card"
+            />
+            <div className="text-sm">
+              <div className="font-medium leading-tight">
+                {post.author?.name || post.author?.username || 'Unknown user'}
+              </div>
+              {post.author?.username && (
+                <div className="text-xs text-muted-foreground">@{post.author.username}</div>
+              )}
             </div>
-            {post.author?.username && (
-              <div className="text-xs text-muted-foreground">@{post.author.username}</div>
-            )}
           </div>
+          <RelativeTime 
+            date={post.created_at} 
+            className="text-sm text-muted-foreground"
+          />
         </div>
       </div>
       <div className="space-y-4">
