@@ -24,7 +24,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-sans antialiased">
         <Navbar />
-        {children}
+        <div className="pb-20">
+          {children}
+        </div>
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
           <div className="pointer-events-auto rounded-full border bg-background/80 backdrop-blur shadow-lg px-3 py-2">
             <FloatingDock

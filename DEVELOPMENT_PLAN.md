@@ -119,15 +119,6 @@ Successfully implemented comprehensive client-side content moderation using NSFW
 #### A. ~~Refactor OCR to Backend~~ (OBSOLETE - OCR Removed)
 **Status:** This task is no longer relevant as OCR functionality has been completely removed from the project to improve simplicity and reliability.
 
-#### B. Enhance Form Validation & UX
-**Goal:** Replace `alert()` with modern notifications and add robust, user-friendly form validation.
-
-- [ ] **To-Do:**
-    - [ ] Replace all `alert()` calls in `post-upload-form.tsx` with `toast()` from the `sonner` library.
-    - [ ] Create a Zod schema for the upload form's data to define validation rules.
-    - [ ] Integrate `react-hook-form` with the Zod schema using `@hookform/resolvers`.
-    - [ ] Refactor the `post-upload-form.tsx` to use `react-hook-form` for state management and validation.
-    - [ ] Display inline error messages for each form field upon validation failure.
 
 #### C. ✅ Implement Automated Testing (COMPLETED)
 **Goal:** Add a testing framework to ensure code quality and prevent regressions.
@@ -174,22 +165,6 @@ Successfully implemented comprehensive automated testing framework with full tes
 - **CI/CD Ready**: Framework ready for continuous integration
 - **Portfolio Value**: Demonstrates testing best practices and TDD approach
 
-#### D. Secure Environment Variables
-**Goal:** Securely manage Supabase credentials and other secrets, ensuring they are not committed to version control.
-
-- [ ] **To-Do:**
-    - [ ] Verify that `.env.local` is included in the `.gitignore` file.
-    - [ ] Create a `.env.local.example` file to document the required environment variables (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
-    - [ ] Ensure the Supabase clients (`src/lib/supabase/*.ts`) correctly read variables from `process.env`.
-
-#### E. Centralize Type Definitions
-**Goal:** Create a single source of truth for data structures to ensure type safety across the application.
-
-- [ ] **To-Do:**
-    - [ ] Define a central `ErrorPost` type in `src/lib/types.ts` based on the database schema.
-    - [ ] Import and use this type in `post-upload-form.tsx` and any other components that handle post data.
-    - [ ] Use the `ErrorPost` type in the `/api/upload/route.ts` to typecheck the data being inserted.
-
 #### F. Make a Profile Page for Users
 **Goal:** Create a public profile page for each user that displays their posts and other information.
 
@@ -199,14 +174,7 @@ Successfully implemented comprehensive automated testing framework with full tes
     - [ ] Create a new `Profile` component to display the user's information, including their avatar, username, and bio.
     - [ ] Display the user's posts in a grid on their profile page.
 
-#### G. Optimize the Connection Between the Front End and Supabase
-**Goal:** Improve the performance and efficiency of data fetching from Supabase.
 
-- [ ] **To-Do:**
-    - [ ] Analyze the existing Supabase queries and identify any bottlenecks.
-    - [ ] Implement caching strategies to reduce the number of requests to the database.
-    - [ ] Use `react-query` or a similar library to manage data fetching, caching, and synchronization.
-    - [ ] Optimize the database schema and queries for better performance.
 
 #### H. ✅ Implement Relative Time Display for Posts and Comments (COMPLETED)
 **Goal:** Display the time of posts and comments as relative time (e.g., "2 hours ago", "3 days ago") instead of static date and time, improving readability and user experience.
