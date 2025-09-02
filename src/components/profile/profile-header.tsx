@@ -8,9 +8,14 @@ import { type Profile } from '@/lib/types'
 
 interface ProfileHeaderProps {
   profile: Pick<Profile, 'id' | 'name' | 'username' | 'avatar_url' | 'created_at'>
+  stats?: {
+    postsCount: number
+    totalLikes: number
+    joinedAt: string
+  }
 }
 
-export default function ProfileHeader({ profile }: ProfileHeaderProps) {
+export default function ProfileHeader({ profile, stats }: ProfileHeaderProps) {
   const joinedDate = formatDistanceToNow(new Date(profile.created_at), { addSuffix: true })
   const displayName = profile.name || profile.username || 'Anonymous User'
   const initials = displayName
@@ -19,6 +24,11 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
     .join('')
     .toUpperCase()
     .slice(0, 2)
+  
+  // Format stats for display
+  const engagementRate = stats && stats.postsCount > 0 
+    ? Math.round(stats.totalLikes / stats.postsCount * 10) / 10 
+    : 0
 
   return (
     <div className="bg-card border border-border rounded-lg p-6 shadow-sm">
@@ -68,6 +78,24 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
               Part of the BugPin community where bugs become beautiful and debugging becomes collaborative.
             </p>
           </div>
+
+          {/* Inline Stats */}
+          {stats && (
+            <div className="flex flex-wrap gap-6 text-sm text-muted-foreground pt-2">
+              <span>
+                <strong className="text-foreground font-semibold">{stats.postsCount}</strong> posts shared
+              </span>
+              <span>
+                <strong className="text-foreground font-semibold">{stats.totalLikes}</strong> total likes
+              </span>
+              <span>
+                <strong className="text-foreground font-semibold">{engagementRate}</strong> average likes per post
+              </span>
+              <span>
+                Active for <strong className="text-foreground font-semibold">{formatDistanceToNow(new Date(stats.joinedAt))}</strong>
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

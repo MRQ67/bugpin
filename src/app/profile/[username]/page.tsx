@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import ProfileHeader from '@/components/profile/profile-header'
-import ProfileStats from '@/components/profile/profile-stats'
 import PostGrid from '@/components/posts/post-grid'
 
 export const revalidate = 0
@@ -78,14 +77,9 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       <div className="container mx-auto px-4 py-8">
-        {/* Profile Header */}
+        {/* Profile Header with Stats */}
         <div className="mb-8">
-          <ProfileHeader profile={profile} />
-        </div>
-
-        {/* Profile Statistics */}
-        <div className="mb-8">
-          <ProfileStats stats={stats} />
+          <ProfileHeader profile={profile} stats={stats} />
         </div>
 
         {/* Posts Section */}

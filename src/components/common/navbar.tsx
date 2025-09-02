@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { AuthButton } from '@/components/auth/auth-button'
 import SearchBar from './search-bar'
 import { FloatingNav } from '@/components/ui/floating-navbar'
+import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -29,6 +30,7 @@ export default function Navbar() {
         </Link>
         <div className="flex items-center gap-2 ml-auto">
           <SearchBar size="sm" />
+          <AnimatedThemeToggler />
           <AuthButton variant="avatar" />
         </div>
       </div>
@@ -43,6 +45,7 @@ export default function Navbar() {
       <FloatingNav side="right">
         <div className="flex items-center gap-2">
           <SearchBar size="sm" />
+          <AnimatedThemeToggler />
           <AuthButton variant="avatar" />
         </div>
       </FloatingNav>

@@ -64,15 +64,15 @@ small, .text-sm {
   h1 {
     font-size: 2rem; /* 32px */
   }
-  
+
   h2 {
     font-size: 1.75rem; /* 28px */
   }
-  
+
   h3 {
     font-size: 1.5rem; /* 24px */
   }
-  
+
   h4 {
     font-size: 1.25rem; /* 20px */
   }
@@ -170,10 +170,10 @@ small, .text-sm {
   --primary-foreground: oklch(0.95 0.02 55);
   --secondary: oklch(0.25 0.06 45);
   --secondary-foreground: oklch(0.85 0.06 60);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.22 0.04 30);
+  --muted-foreground: oklch(0.65 0.06 45);
+  --accent: oklch(0.25 0.06 45);
+  --accent-foreground: oklch(0.85 0.06 60);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -200,4 +200,9 @@ small, .text-sm {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+::view-transition-old(root), ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
 }
