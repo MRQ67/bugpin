@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Heart } from 'lucide-react'
 import { useOptimisticLikes } from '@/hooks/use-optimistic-likes'
+import { useAuth } from '@/components/providers/auth-provider'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 
@@ -15,9 +16,10 @@ interface LikeButtonProps {
 }
 
 export default function LikeButton({ postId, initialCount = 0, initialLiked = false }: LikeButtonProps) {
-  const [userId, setUserId] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { user } = useAuth() // Use centralized auth state
+  const supabase = createClient() // Use singleton client
 
   const {
     likeState,
@@ -32,33 +34,17 @@ export default function LikeButton({ postId, initialCount = 0, initialLiked = fa
 
   useEffect(() => {
     let isMounted = true
-    let currentUserId: string | null = null
-    const supabase = createClient() // Fresh client for this effect
+    const currentUserId = user?.id ?? null
 
     const bootstrap = async () => {
       try {
         setError(null)
         
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser()
-        
-        if (userError) {
-          console.warn('Auth error in like button:', userError)
-          // Continue without user - likes can still be viewed
-        }
-        
-        if (!isMounted) return
-        
-        currentUserId = user?.id ?? null
-        setUserId(currentUserId)
-
         // Fetch current like state from server
         try {
           const [{ data: myLike }, countRes] = await Promise.all([
-            user
-              ? supabase.from('likes').select('id').eq('error_post_id', postId).eq('user_id', user.id).maybeSingle()
+            currentUserId
+              ? supabase.from('likes').select('id').eq('error_post_id', postId).eq('user_id', currentUserId).maybeSingle()
               : Promise.resolve({ data: null }),
             supabase.from('likes').select('id', { count: 'exact', head: true }).eq('error_post_id', postId),
           ])
@@ -120,15 +106,15 @@ export default function LikeButton({ postId, initialCount = 0, initialLiked = fa
       isMounted = false
       supabase.removeChannel(channel)
     }
-  }, [postId, initialCount, syncState])
+  }, [postId, user, supabase, syncState, initialCount]) // Add user and initialCount back
 
   const handleToggle = async () => {
-    if (!userId) {
+    if (!user?.id) {
       toast.error('Please sign in to like posts')
       return
     }
 
-    await toggleLike(userId)
+    await toggleLike(user.id)
   }
 
   if (!mounted) {

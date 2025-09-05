@@ -2,32 +2,43 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { User, LogOut, Settings } from 'lucide-react'
-import { useUser } from '@/hooks/use-user'
+import { useAuth } from '@/components/providers/auth-provider'
 
 export function AuthButton({ variant = 'default' }: { variant?: 'default' | 'avatar' }) {
-  const supabase = createClient()
   const [loading, setLoading] = useState(false)
-  const { user, profile, loading: userLoading } = useUser()
+  const { user, profile, loading: userLoading, signOut } = useAuth()
 
   const handleSignOut = async () => {
+    if (loading) return // Prevent multiple clicks
+    
     try {
       setLoading(true)
-      await supabase.auth.signOut()
+      await signOut()
+      // Let the auth provider handle the redirect to /home
+    } catch (error) {
+      console.error('Sign out error:', error)
+      // Error handling - user will see they're still logged in if it fails
     } finally {
       setLoading(false)
     }
   }
 
   if (userLoading) {
+    if (variant === 'avatar') {
+      return (
+        <Avatar className="h-7 w-7 animate-pulse">
+          <AvatarFallback className="bg-muted">•••</AvatarFallback>
+        </Avatar>
+      )
+    }
     return (
-      <Avatar className="h-7 w-7">
-        <AvatarFallback>...</AvatarFallback>
-      </Avatar>
+      <Button size="sm" variant="ghost" disabled>
+        <div className="h-4 w-12 bg-muted animate-pulse rounded" />
+      </Button>
     )
   }
 

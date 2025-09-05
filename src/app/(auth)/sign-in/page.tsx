@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import SignInForm from '@/components/auth/sign-in-form'
 
 export const metadata: Metadata = {
-  title: 'Sign in • BugPin',
+  title: 'Sign up or Sign in • BugPin',
 }
 
 export default function SignInPage() {
@@ -11,7 +11,7 @@ export default function SignInPage() {
       <div className="max-w-sm w-full">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-semibold">Welcome to BugPin</h1>
-          <p className="text-muted-foreground mt-1">Pin your pain. Debug together.</p>
+          <p className="text-muted-foreground mt-1">Sign up or sign in to pin your pain and debug together.</p>
         </div>
         <SignInForm />
       </div>

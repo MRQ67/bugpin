@@ -16,10 +16,11 @@ interface LikeMutationVariables {
 
 export function useOptimisticLikes(initialState: LikeState, postId: string) {
   const [optimisticState, setOptimisticState] = useState<LikeState>(initialState)
+  const supabase = createClient() // Use singleton client
 
   const likeMutation = useOptimisticMutation<void, LikeMutationVariables>({
     mutationFn: async ({ postId, userId, isCurrentlyLiked }) => {
-      const supabase = createClient() // Fresh client for each mutation
+      // Don't make any auth calls here, just use the provided userId
       
       try {
         if (isCurrentlyLiked) {

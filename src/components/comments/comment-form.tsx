@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/components/providers/auth-provider'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
 export default function CommentForm({ postId }: { postId: string }) {
   const supabase = createClient()
+  const { user } = useAuth()
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
@@ -16,9 +18,6 @@ export default function CommentForm({ postId }: { postId: string }) {
     if (!text) return
     setSubmitting(true)
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
       
       // Get or create the current user's profile

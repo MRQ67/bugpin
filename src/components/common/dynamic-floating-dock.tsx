@@ -2,10 +2,10 @@
 
 import { FloatingDock } from '@/components/ui/floating-dock'
 import { Home, Plus, User } from 'lucide-react'
-import { useUser } from '@/hooks/use-user'
+import { useAuth } from '@/components/providers/auth-provider'
 
 export default function DynamicFloatingDock() {
-  const { profile } = useUser()
+  const { profile } = useAuth()
   
   const items = [
     {

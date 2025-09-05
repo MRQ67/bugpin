@@ -4,6 +4,8 @@ import { Zain } from "next/font/google";
 import Navbar from "@/components/common/navbar";
 import DynamicFloatingDock from "@/components/common/dynamic-floating-dock";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { AuthErrorBoundary } from "@/components/providers/auth-error-boundary";
 
 const zain = Zain({
   subsets: ['latin'],
@@ -29,15 +31,19 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          <Navbar />
-          <div className="pb-20">
-            {children}
-          </div>
-          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
-            <div className="pointer-events-auto rounded-full border bg-background/80 backdrop-blur shadow-lg px-3 py-2">
-              <DynamicFloatingDock />
-            </div>
-          </div>
+          <AuthErrorBoundary>
+            <AuthProvider>
+              <Navbar />
+              <div className="pb-20">
+                {children}
+              </div>
+              <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+                <div className="pointer-events-auto rounded-full border bg-background/80 backdrop-blur shadow-lg px-3 py-2">
+                  <DynamicFloatingDock />
+                </div>
+              </div>
+            </AuthProvider>
+          </AuthErrorBoundary>
         </ThemeProvider>
       </body>
     </html>

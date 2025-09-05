@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/components/providers/auth-provider'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { RelativeTime } from '@/components/ui/relative-time'
@@ -15,7 +16,7 @@ interface OptimisticCommentsProps {
 
 export default function OptimisticComments({ postId }: OptimisticCommentsProps) {
   const [content, setContent] = useState('')
-  const [user, setUser] = useState<any>(null)
+  const { user } = useAuth()
   const [profiles, setProfiles] = useState<Record<string, { name?: string; username?: string; avatar_url?: string }>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -36,14 +37,8 @@ export default function OptimisticComments({ postId }: OptimisticCommentsProps) 
       try {
         setError(null)
         
-        // Get current user
-        const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser()
-        if (userError) {
-          console.warn('Auth error:', userError)
-          // Continue without user - comments can still be viewed
-        }
+        // User is available from auth provider
         if (!mounted) return
-        setUser(currentUser)
 
         // Fetch initial comments (without profiles join to avoid relationship issues)
         const { data: commentsData, error: commentsError } = await supabase

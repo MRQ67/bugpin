@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/components/providers/auth-provider'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
@@ -21,6 +22,7 @@ function randomName(ext: string) {
 export default function PostUploadForm() {
   const router = useRouter()
   const supabase = createClient()
+  const { user } = useAuth()
   const { analyzeImage, preloadModel, isLoading: moderationLoading, error: moderationError } = useContentModeration()
   const { uploadPost, uploadProgress, isUploading, resetUpload } = useOptimisticUpload()
 
@@ -111,12 +113,6 @@ export default function PostUploadForm() {
     }
 
     try {
-      // Get user
-      const {
-        data: { user },
-        error: userErr,
-      } = await supabase.auth.getUser()
-      if (userErr) throw userErr
       if (!user) throw new Error('Not authenticated')
 
       // Upload with optimistic feedback

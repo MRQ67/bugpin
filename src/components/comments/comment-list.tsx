@@ -13,10 +13,10 @@ type Item = {
 }
 
 export default function CommentList({ postId }: { postId: string }) {
-  const supabase = createClient()
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
   const [profiles, setProfiles] = useState<Record<string, { name?: string | null; username?: string | null; avatar_url?: string | null }>>({})
+  const supabase = createClient() // Use singleton client
 
   useEffect(() => {
     let mounted = true
@@ -90,13 +90,16 @@ export default function CommentList({ postId }: { postId: string }) {
             const uid = (inserted as any).user_id
             if (uid) {
               // lazy-load missing profile
-              supabase
-                .from('profiles')
-                .select('id, name, username, avatar_url')
-                .eq('id', uid)
-                .single()
-                .then(({ data: p }) => {
-                  if (!p) return
+              const loadProfile = async () => {
+                try {
+                  const { data: p, error } = await supabase
+                    .from('profiles')
+                    .select('id, name, username, avatar_url')
+                    .eq('id', uid)
+                    .single()
+                  
+                  if (error || !p) return
+                  
                   setProfiles((prev) => ({
                     ...prev,
                     [(p as any).id]: {
@@ -105,7 +108,11 @@ export default function CommentList({ postId }: { postId: string }) {
                       avatar_url: (p as any).avatar_url,
                     },
                   }))
-                })
+                } catch (err) {
+                  console.warn('Failed to load profile:', err)
+                }
+              }
+              loadProfile()
             }
           } else if (payload.eventType === 'DELETE') {
             setItems((prev) => prev.filter((c) => c.id !== (payload.old as any).id))

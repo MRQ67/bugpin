@@ -6,11 +6,13 @@ export async function POST(req: Request) {
     const supabase = await createActionClient()
 
     const {
-      data: { user },
-      error: userErr,
-    } = await supabase.auth.getUser()
-    if (userErr) throw userErr
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      data: { session },
+      error: sessionErr,
+    } = await supabase.auth.getSession()
+    if (sessionErr) throw sessionErr
+    if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    
+    const user = session.user
 
     const form = await req.formData()
     const file = form.get('file') as File | null

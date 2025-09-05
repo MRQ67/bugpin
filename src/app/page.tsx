@@ -1,9 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
-import PostGrid from '@/components/posts/post-grid'
+import RealtimePostGrid from '@/components/posts/realtime-post-grid'
 import SearchBar from '@/components/common/search-bar'
 import TagBar from '@/components/common/tag-bar'
 
 export const revalidate = 0
+export const dynamic = 'force-dynamic' // Prevent Next.js caching
+export const fetchCache = 'force-no-store' // Force fresh data
 
 export default async function Home({
   searchParams,
@@ -18,8 +20,9 @@ export default async function Home({
     const sp = (await searchParams) ?? {}
     const q = (sp.q || '').trim()
 
-    // Get current user for like status
-    const { data: { user } } = await supabase.auth.getUser()
+    // Get current session and user safely
+    const { data: { session } } = await supabase.auth.getSession()
+    const user = session?.user
 
     // First get posts
     let query = supabase.from('error_posts').select('*')
@@ -83,7 +86,7 @@ export default async function Home({
   return (
     <div className="container mx-auto px-4 py-4">
       <TagBar />
-      <PostGrid posts={posts} />
+      <RealtimePostGrid initialPosts={posts} />
     </div>
   )
 }
