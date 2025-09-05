@@ -31,21 +31,21 @@ export default function SearchBar({ size = "md" }: SearchBarProps) {
   const sizeClasses = {
     sm: {
       input: "h-8 text-sm",
-      button: "h-6 w-6",
-      icon: "h-4 w-4",
+      button: "h-6 w-8",
+      icon: "h-4 w-4", 
       baseW: "w-28 md:w-40",
       focusW: "w-60 md:w-80",
     },
     md: {
       input: "h-10",
-      button: "h-8 w-8",
+      button: "h-8 w-10",
       icon: "h-5 w-5",
       baseW: "w-32 md:w-48",
       focusW: "w-72 md:w-[28rem]",
     },
     lg: {
       input: "h-12 text-lg",
-      button: "h-10 w-10",
+      button: "h-10 w-12",
       icon: "h-6 w-6",
       baseW: "w-40 md:w-56",
       focusW: "w-80 md:w-[32rem]",
@@ -68,11 +68,11 @@ export default function SearchBar({ size = "md" }: SearchBarProps) {
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className={`w-full rounded-full border-transparent bg-white pl-6 pr-16 shadow-md placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-transparent ${sizeClasses[size].input}`}
+          className={`w-full rounded-full border-transparent bg-white pl-6 pr-1 shadow-md placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-transparent ${sizeClasses[size].input}`}
         />
         <button
           type="submit"
-          className={`absolute inset-y-0 right-0 my-1 mr-1 flex items-center justify-center rounded-full bg-black text-white shadow-md transition-transform duration-200 hover:scale-105 ${buttonSize}`}
+          className={`absolute inset-y-1 right-1 flex items-center justify-center rounded-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90 aspect-square ${sizeClasses[size].input.includes('h-8') ? 'w-6' : sizeClasses[size].input.includes('h-10') ? 'w-8' : 'w-10'}`}
         >
           <Search className={iconSize} />
         </button>
