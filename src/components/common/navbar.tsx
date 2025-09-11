@@ -14,7 +14,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [showFloating, setShowFloating] = useState(false)
   const pathname = usePathname()
-  const isLandingPage = pathname === '/home'
+  const isLandingPage = pathname === '/' // Landing page is now at root
 
   useEffect(() => {
     const onScroll = () => {
@@ -27,6 +27,9 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  // Determine where the logo should link to
+  const logoHref = isLandingPage ? "/" : "/home"
 
   return (
     <>
@@ -42,7 +45,7 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4 h-14 flex items-center justify-center gap-4">
           <div className="flex items-center gap-3">
-            <Link href={isLandingPage ? "/home" : "/"} className="font-semibold shrink-0 inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors">
+            <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors">
               <Pin className="h-4 w-4" />
               <span>BugPin</span>
             </Link>
@@ -70,7 +73,7 @@ export default function Navbar() {
             className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
           >
             <div className="flex items-center gap-3 px-4 py-2 rounded-full border border-border/20 bg-card/90 backdrop-blur-md shadow-lg">
-              <Link href={isLandingPage ? "/home" : "/"} className="font-semibold shrink-0 inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors">
+              <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors">
                 <Pin className="h-4 w-4" />
                 <span className="hidden sm:block">BugPin</span>
               </Link>

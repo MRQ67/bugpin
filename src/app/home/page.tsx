@@ -1,175 +1,90 @@
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Pin, Code, Users, Zap, ArrowRight, Github, Search, Heart } from "lucide-react"
-import Link from "next/link"
+import { createClient } from '@/lib/supabase/server'
+import RealtimePostGrid from '@/components/posts/realtime-post-grid'
+import SearchBar from '@/components/common/search-bar'
 
-export default function LandingPage() {
+export const revalidate = 0
+export const dynamic = 'force-dynamic' // Prevent Next.js caching
+export const fetchCache = 'force-no-store' // Force fresh data
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: Promise<{ q?: string }>
+}) {
+  let posts: any[] = []
+  let error: any = null
+
+  try {
+    const supabase = await createClient()
+    const sp = (await searchParams) ?? {}
+    const q = (sp.q || '').trim()
+
+    // Get current session and user safely
+    const { data: { session } } = await supabase.auth.getSession()
+    const user = session?.user
+
+    // First get posts
+    let query = supabase.from('error_posts').select('*')
+    if (q) {
+      // Basic search across title, language, and error type
+      query = query.or(
+        `title.ilike.%${q}%,language.ilike.%${q}%,error_type.ilike.%${q}%`
+      )
+    }
+    
+    const result = await query.order('created_at', { ascending: false }).limit(60)
+    const postsData = result.data ?? []
+    
+    if (postsData.length > 0) {
+      const postIds = postsData.map(p => p.id)
+      
+      // Get like counts for all posts
+      const { data: likeCounts } = await supabase
+        .from('likes')
+        .select('error_post_id')
+        .in('error_post_id', postIds)
+      
+      // Get user's likes if authenticated
+      let userLikes: any[] = []
+      if (user) {
+        const { data } = await supabase
+          .from('likes')
+          .select('error_post_id')
+          .eq('user_id', user.id)
+          .in('error_post_id', postIds)
+        userLikes = data ?? []
+      }
+      
+      // Count likes per post
+      const likeCountMap: Record<string, number> = {}
+      likeCounts?.forEach(like => {
+        likeCountMap[like.error_post_id] = (likeCountMap[like.error_post_id] || 0) + 1
+      })
+      
+      // Create user likes set for quick lookup
+      const userLikeSet = new Set(userLikes.map(like => like.error_post_id))
+      
+      // Transform posts with like information
+      posts = postsData.map(post => ({
+        ...post,
+        likes_count: likeCountMap[post.id] || 0,
+        user_liked: userLikeSet.has(post.id),
+      }))
+    }
+    
+    error = result.error
+  } catch (err) {
+    console.error('Failed to load posts', err)
+    error = err
+  }
+
+  if (error) {
+    console.error('Failed to load posts', error)
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
-              🚀 Now in Beta
-            </Badge>
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tighter">
-              Pin Your <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Pain</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              A social platform for developers to share, discover, and solve coding errors together. Turn your bugs into learning opportunities.
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/sign-in">
-              <Button size="lg" className="px-8 py-3 text-lg font-semibold group">
-                Start Pinning
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Link href="/sign-in">
-              <Button variant="outline" size="lg" className="px-8 py-3 text-lg font-semibold">
-                Sign In
-              </Button>
-            </Link>
-          </div>
-
-          <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span>Growing Community</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Code className="h-4 w-4" />
-              <span>All Languages</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              <span>Instant Help</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center space-y-4 mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold">Why Choose BugPin?</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Transform your coding struggles into collaborative learning experiences
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card className="border-2 hover:border-primary/50 transition-colors group">
-            <CardContent className="p-8 text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Pin className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Pin Your Errors</h3>
-              <p className="text-muted-foreground">
-                Share your coding errors with syntax highlighting, stack traces, and detailed context. Make your bugs discoverable and searchable.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 hover:border-primary/50 transition-colors group">
-            <CardContent className="p-8 text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Search className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Discover Solutions</h3>
-              <p className="text-muted-foreground">
-                Find similar errors and solutions from the community. Search by language, framework, or error type to get instant help.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-2 hover:border-primary/50 transition-colors group">
-            <CardContent className="p-8 text-center space-y-4">
-              <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Heart className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">Build Community</h3>
-              <p className="text-muted-foreground">
-                Like, comment, and collaborate on error posts. Build your reputation by helping others solve their coding challenges.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="bg-muted/20 py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold">How It Works</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Three simple steps to turn your coding errors into learning opportunities
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold">
-                1
-              </div>
-              <h3 className="text-xl font-semibold">Share Your Error</h3>
-              <p className="text-muted-foreground">
-                Upload your error with code snippets, stack traces, and context. Our platform automatically detects the language and error type.
-              </p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold">
-                2
-              </div>
-              <h3 className="text-xl font-semibold">Get Community Help</h3>
-              <p className="text-muted-foreground">
-                Receive comments, suggestions, and solutions from experienced developers in the community who've faced similar issues.
-              </p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold">
-                3
-              </div>
-              <h3 className="text-xl font-semibold">Learn & Grow</h3>
-              <p className="text-muted-foreground">
-                Mark solutions, build your knowledge base, and help others with similar problems. Turn bugs into learning experiences.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="text-center space-y-8 bg-gradient-to-r from-primary/10 to-primary/5 rounded-3xl p-12 md:p-16">
-          <div className="space-y-4">
-            <h2 className="text-3xl md:text-5xl font-bold">Ready to Pin Your Pain?</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of developers who are turning their coding errors into collaborative learning experiences.
-            </p>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/sign-in">
-              <Button size="lg" className="px-8 py-3 text-lg font-semibold group">
-                Create Free Account
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Link href="/sign-in">
-              <Button variant="ghost" size="lg" className="px-8 py-3 text-lg font-semibold">
-                Already have an account? Sign In
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+    <div className="container mx-auto px-4 py-4">
+      <RealtimePostGrid initialPosts={posts} />
     </div>
   )
 }

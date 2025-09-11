@@ -6,7 +6,7 @@ export async function middleware(req: NextRequest) {
   const supabase = createMiddlewareClient(req, res)
 
   try {
-    // Use getSession instead of getUser to avoid AuthSessionMissingError
+    // Use getSession to check auth status
     const {
       data: { session },
     } = await supabase.auth.getSession()
@@ -16,10 +16,10 @@ export async function middleware(req: NextRequest) {
     const protectedPaths = ['/upload', '/profile']
     const isProtected = protectedPaths.some((p) => url.pathname.startsWith(p))
     const isAuthPath = url.pathname.startsWith('/sign-in') || url.pathname.startsWith('/auth')
-    const isHomeLanding = url.pathname === '/home'
+    const isFeedPage = url.pathname === '/home'
 
-    // Redirect authenticated users from landing page to root
-    if (isHomeLanding && user) {
+    // Redirect authenticated users from feed page to root (which will now be the main app)
+    if (isFeedPage && user) {
       return NextResponse.redirect(new URL('/', url))
     }
 
@@ -43,7 +43,7 @@ export async function middleware(req: NextRequest) {
     return res
   } catch (error) {
     console.error('Middleware auth error:', error)
-    // If there's an auth error and we're on the root path, redirect to home
+    // If there's an auth error and we're on the root path, redirect to home (landing page)
     if (req.nextUrl.pathname === '/') {
       return NextResponse.redirect(new URL('/home', req.nextUrl))
     }
@@ -51,6 +51,22 @@ export async function middleware(req: NextRequest) {
   }
 }
 
+// Updated matcher to run on all paths except static assets and API routes
 export const config = {
-  matcher: ['/', '/home', '/sign-in', '/auth/:path*', '/upload/:path*', '/profile/:path*'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    {
+      source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+  ],
 }

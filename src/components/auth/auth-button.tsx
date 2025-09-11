@@ -18,7 +18,7 @@ export function AuthButton({ variant = 'default' }: { variant?: 'default' | 'ava
     try {
       setLoading(true)
       await signOut()
-      // Let the auth provider handle the redirect to /home
+      // Let the auth provider handle the redirect to the landing page
     } catch (error) {
       console.error('Sign out error:', error)
       // Error handling - user will see they're still logged in if it fails

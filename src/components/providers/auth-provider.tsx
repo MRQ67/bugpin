@@ -75,8 +75,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null)
       setProfile(null)
       setSession(null)
-      // Redirect to home page after sign out
-      router.push('/home')
+      // Redirect to landing page after sign out
+      router.push('/')
     } catch (error) {
       console.error('Sign out error:', error)
     }
