@@ -11,13 +11,13 @@ export default function LandingPage() {
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="text-center space-y-8">
           <div className="space-y-4">
-            <Badge variant="outline" className="px-4 py-2 text-sm font-medium">
+            <Badge variant="outline" className="px-4 py-2 text-sm font-medium mx-auto">
               🚀 Now in Beta
             </Badge>
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-tight tracking-tighter">
               Pin Your <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Pain</span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed text-center">
               A social platform for developers to share, discover, and solve coding errors together. Turn your bugs into learning opportunities.
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function LandingPage() {
       <section className="container mx-auto px-4 py-16">
         <div className="text-center space-y-4 mb-16">
           <h2 className="text-3xl md:text-4xl font-bold">Why Choose BugPin?</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed text-center">
             Transform your coding struggles into collaborative learning experiences
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function LandingPage() {
                 <Pin className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold">Pin Your Errors</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-center">
                 Share your coding errors with syntax highlighting, stack traces, and detailed context. Make your bugs discoverable and searchable.
               </p>
             </CardContent>
@@ -81,7 +81,7 @@ export default function LandingPage() {
                 <Search className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold">Discover Solutions</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-center">
                 Find similar errors and solutions from the community. Search by language, framework, or error type to get instant help.
               </p>
             </CardContent>
@@ -93,7 +93,7 @@ export default function LandingPage() {
                 <Heart className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold">Build Community</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-center">
                 Like, comment, and collaborate on error posts. Build your reputation by helping others solve their coding challenges.
               </p>
             </CardContent>
@@ -106,7 +106,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-3xl md:text-4xl font-bold">How It Works</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed text-center">
               Three simple steps to turn your coding errors into learning opportunities
             </p>
           </div>
@@ -117,7 +117,7 @@ export default function LandingPage() {
                 1
               </div>
               <h3 className="text-xl font-semibold">Share Your Error</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-center">
                 Upload your error with code snippets, stack traces, and context. Our platform automatically detects the language and error type.
               </p>
             </div>
@@ -127,7 +127,7 @@ export default function LandingPage() {
                 2
               </div>
               <h3 className="text-xl font-semibold">Get Community Help</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-center">
                 Receive comments, suggestions, and solutions from experienced developers in the community who've faced similar issues.
               </p>
             </div>
@@ -137,7 +137,7 @@ export default function LandingPage() {
                 3
               </div>
               <h3 className="text-xl font-semibold">Learn & Grow</h3>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground text-center">
                 Mark solutions, build your knowledge base, and help others with similar problems. Turn bugs into learning experiences.
               </p>
             </div>
@@ -150,7 +150,7 @@ export default function LandingPage() {
         <div className="text-center space-y-8 bg-gradient-to-r from-primary/10 to-primary/5 rounded-3xl p-12 md:p-16">
           <div className="space-y-4">
             <h2 className="text-3xl md:text-5xl font-bold">Ready to Pin Your Pain?</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed text-center">
               Join thousands of developers who are turning their coding errors into collaborative learning experiences.
             </p>
           </div>
