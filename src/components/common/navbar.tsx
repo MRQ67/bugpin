@@ -1,7 +1,6 @@
 "use client"
 
 import Link from 'next/link'
-import { Pin } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
@@ -45,8 +44,8 @@ export default function Navbar() {
       >
         <div className="container mx-auto px-4 h-14 flex items-center justify-center gap-4">
           <div className="flex items-center gap-3">
-            <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors">
-              <Pin className="h-4 w-4" />
+            <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+              <img src="/bug_logo.png" alt="BugPin Logo" className="h-7 w-7" />
               <span>BugPin</span>
             </Link>
             {!isLandingPage && <SearchBar size="sm" />}
@@ -73,8 +72,8 @@ export default function Navbar() {
             className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
           >
             <div className="flex items-center gap-3 px-4 py-2 rounded-full border border-border/20 bg-card/90 backdrop-blur-md shadow-lg">
-              <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-1.5 text-foreground hover:text-primary transition-colors">
-                <Pin className="h-4 w-4" />
+              <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+                <img src="/bug_logo.png" alt="BugPin Logo" className="h-6 w-6" />
                 <span className="hidden sm:block">BugPin</span>
               </Link>
               
