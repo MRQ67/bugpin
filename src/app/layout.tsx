@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Zain } from "next/font/google";
+import { Zain, DM_Sans } from "next/font/google";
 import Navbar from "@/components/common/navbar";
 import ConditionalFloatingDock from "@/components/common/conditional-floating-dock";
 import ConditionalContent from "@/components/common/conditional-content";
@@ -11,6 +11,12 @@ import { AuthErrorBoundary } from "@/components/providers/auth-error-boundary";
 const zain = Zain({
   subsets: ['latin'],
   weight: ['200', '300', '400', '700', '800', '900'],
+});
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  variable: '--font-dm-sans',
 });
 
 export const metadata: Metadata = {
@@ -28,7 +34,7 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-title" content="BugPin" />
       </head>
-      <body className="font-sans antialiased">
+      <body className={`font-sans antialiased ${dmSans.variable}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

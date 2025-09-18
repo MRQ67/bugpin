@@ -34,10 +34,12 @@ export default function Navbar() {
     <>
       {/* Fixed Navbar */}
       <motion.header 
-        className="sticky top-0 z-40 w-full border-b border-border/50"
+        className="sticky top-0 z-40 w-full"
+        style={{
+          background: 'linear-gradient(to bottom right, #0f172a, #1e293b, #000000) !important',
+        }}
         animate={{
-          backgroundColor: scrolled ? 'transparent' : 'hsl(var(--background) / 0.8)',
-          backdropFilter: scrolled ? 'blur(0px)' : 'blur(8px)',
+          backdropFilter: 'blur(0px)',
           opacity: showFloating ? 0 : 1,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}

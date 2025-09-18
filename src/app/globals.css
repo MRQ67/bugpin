@@ -17,6 +17,11 @@ body {
   padding: 0;
 }
 
+/* DM Sans font utility class */
+.font-dm-sans {
+  font-family: var(--font-dm-sans), 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
 /* Typography scale */
 h1 {
   font-size: 1.75rem; /* 28px */
