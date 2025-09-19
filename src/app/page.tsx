@@ -165,50 +165,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="bg-muted/20 py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold">How It Works</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed text-center">
-              Three simple steps to turn your coding errors into learning opportunities
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold">
-                1
-              </div>
-              <h3 className="text-xl font-semibold">Share Your Error</h3>
-              <p className="text-muted-foreground text-center">
-                Upload your error with code snippets, stack traces, and context. Our platform automatically detects the language and error type.
-              </p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold">
-                2
-              </div>
-              <h3 className="text-xl font-semibold">Get Community Help</h3>
-              <p className="text-muted-foreground text-center">
-                Receive comments, suggestions, and solutions from experienced developers in the community who've faced similar issues.
-              </p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="w-12 h-12 mx-auto bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xl font-bold">
-                3
-              </div>
-              <h3 className="text-xl font-semibold">Learn & Grow</h3>
-              <p className="text-muted-foreground text-center">
-                Mark solutions, build your knowledge base, and help others with similar problems. Turn bugs into learning experiences.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-16">
         <div className="text-center space-y-8 bg-gradient-to-r from-primary/10 to-primary/5 rounded-3xl p-12 md:p-16">
