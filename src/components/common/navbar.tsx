@@ -34,10 +34,7 @@ export default function Navbar() {
     <>
       {/* Fixed Navbar */}
       <motion.header 
-        className="sticky top-0 z-40 w-full"
-        style={{
-          background: 'linear-gradient(to bottom right, #0f172a, #1e293b, #000000) !important',
-        }}
+        className="sticky top-0 z-40 w-full bg-transparent"
         animate={{
           backdropFilter: 'blur(0px)',
           opacity: showFloating ? 0 : 1,
@@ -47,7 +44,7 @@ export default function Navbar() {
         <div className="container mx-auto px-4 h-14 flex items-center justify-center gap-4">
           <div className="flex items-center gap-3">
             <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-              <img src="/bug_logo.png" alt="BugPin Logo" className="h-7 w-7" />
+              <img src="/bug_logo.svg" alt="BugPin Logo" className="h-7 w-7" />
               <span>BugPin</span>
             </Link>
             {!isLandingPage && <SearchBar size="sm" />}
@@ -75,7 +72,7 @@ export default function Navbar() {
           >
             <div className="flex items-center gap-3 px-4 py-2 rounded-full border border-border/20 bg-card/90 backdrop-blur-md shadow-lg">
               <Link href={logoHref} className="font-semibold shrink-0 inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors">
-                <img src="/bug_logo.png" alt="BugPin Logo" className="h-6 w-6" />
+                <img src="/bug_logo.svg" alt="BugPin Logo" className="h-6 w-6" />
                 <span className="hidden sm:block">BugPin</span>
               </Link>
               

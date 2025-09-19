@@ -13,7 +13,7 @@ export default function LandingPage() {
         {/* Error Images Background */}
         <div className="absolute inset-0">
           {/* Dark gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-black"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-red-900 via-red-800 to-black"></div>
           
           {/* Error Images positioned in corners, closer to center */}
           <div className="absolute inset-0 overflow-hidden">
@@ -78,7 +78,7 @@ export default function LandingPage() {
             <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-black leading-tight tracking-tighter text-foreground font-dm-sans">
               Pin Your <span className="relative inline-flex items-center justify-center mx-2">
                 <Image 
-                  src="/bug_logo.png" 
+                  src="/bug_logo.svg" 
                   alt="BugPin Logo" 
                   width={50} 
                   height={50} 
@@ -134,7 +134,7 @@ export default function LandingPage() {
             <div className="space-y-6">
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
                 <Image 
-                  src="/bug_logo.png" 
+                  src="/bug_logo.svg" 
                   alt="BugPin Logo" 
                   width={32} 
                   height={32}
@@ -245,19 +245,27 @@ export default function LandingPage() {
         
         {/* Black content section */}
         <div className="bg-black text-white">
-          <div className="container mx-auto px-4 py-8">
+          <div className="container mx-auto px-4 py-12">
             <div className="grid md:grid-cols-4 gap-8">
               {/* Brand Section */}
               <div className="md:col-span-1">
                 <div className="flex items-center gap-3 mb-4">
                   <Image 
-                    src="/bug_logo.png" 
+                    src="/bug_logo.svg" 
                     alt="BugPin Logo" 
                     width={40} 
                     height={40}
                     className="w-10 h-10"
                   />
                   <span className="text-2xl font-bold font-dm-sans">BugPin</span>
+                  <span className="text-2xl font-bold font-dm-sans">by</span>
+                  <Image 
+                    src="/aa3_logo.svg" 
+                    alt="AA3 Logo" 
+                    width={40} 
+                    height={30}
+                    className="w-10 h-8"
+                  />
                 </div>
                 <p className="text-gray-300 text-sm leading-relaxed">
                   A social platform where developers share coding errors, discover solutions, and turn debugging frustrations into collaborative learning experiences.
